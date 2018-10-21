@@ -1,10 +1,13 @@
 package com.chrissetiana.notekeeper;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public final class CourseInfo {
+public final class CourseInfo implements Parcelable {
     private final String noteId;
     private final String noteTitle;
     private final List<ModuleInfo> modules;
@@ -13,6 +16,25 @@ public final class CourseInfo {
         this.noteId = noteId;
         this.noteTitle = noteTitle;
         this.modules = modules;
+    }
+
+    public static final Creator<CourseInfo> CREATOR = new Creator<CourseInfo>() {
+        @Override
+        public CourseInfo createFromParcel(Parcel in) {
+            return new CourseInfo(in);
+        }
+
+        @Override
+        public CourseInfo[] newArray(int size) {
+            return new CourseInfo[size];
+        }
+    };
+
+    private CourseInfo(Parcel source) {
+        noteId = source.readString();
+        noteTitle = source.readString();
+        modules = new ArrayList<>();
+        source.readTypedList(modules, ModuleInfo.CREATOR);
     }
 
     String getNoteId() {
@@ -72,5 +94,17 @@ public final class CourseInfo {
         CourseInfo that = (CourseInfo) o;
 
        return noteId.equals(that.noteId);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+//        dest.writeTypedList(modules);
+        dest.writeString(noteId);
+        dest.writeString(noteTitle);
     }
 }
