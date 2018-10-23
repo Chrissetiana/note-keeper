@@ -25,6 +25,7 @@ public class NoteActivity extends AppCompatActivity {
     private Spinner spinnerText;
     private EditText textTitle;
     private EditText textNote;
+    private int newPosition;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,23 +51,6 @@ public class NoteActivity extends AppCompatActivity {
         }
     }
 
-    private void displayNote(Spinner spinnerText, EditText textTitle, EditText textNote) {
-        List<CourseInfo> list = DataManager.getInstance().getCourses();
-        int courseIndex = list.indexOf(note.getCourseInfo());
-        spinnerText.setSelection(courseIndex);
-        textTitle.setText(note.getTitle());
-        textNote.setText(note.getText());
-    }
-
-    private void readDisplayStateValues() {
-        Intent intent = getIntent();
-        int position = intent.getIntExtra(NOTE_POSITION, POSITION_NOT_SET);
-        isNewNote = position == POSITION_NOT_SET;
-        if (!isNewNote) {
-            note = DataManager.getInstance().getNotes().get(position);
-        }
-    }
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_main, menu);
@@ -88,6 +72,44 @@ public class NoteActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == SHOW_CAMERA && resultCode == RESULT_OK) {
+            Bitmap thumbnail = data.getParcelableExtra("data");
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        saveNote();
+    }
+
+    private void displayNote(Spinner spinnerText, EditText textTitle, EditText textNote) {
+        List<CourseInfo> list = DataManager.getInstance().getCourses();
+        int courseIndex = list.indexOf(note.getCourse());
+        spinnerText.setSelection(courseIndex);
+        textTitle.setText(note.getTitle());
+        textNote.setText(note.getText());
+    }
+
+    private void readDisplayStateValues() {
+        Intent intent = getIntent();
+        int position = intent.getIntExtra(NOTE_POSITION, POSITION_NOT_SET);
+        isNewNote = position == POSITION_NOT_SET;
+        if (isNewNote) {
+            createNote();
+        } else {
+            note = DataManager.getInstance().getNotes().get(position);
+        }
+    }
+
+    private void createNote() {
+        DataManager dataManager = DataManager.getInstance();
+        newPosition = dataManager.createNewNote();
+        note = dataManager.getNotes().get(newPosition);
+    }
+
     private void sendEmail() {
         CourseInfo course = (CourseInfo) spinnerText.getSelectedItem();
         String subject = textTitle.getText().toString();
@@ -107,10 +129,9 @@ public class NoteActivity extends AppCompatActivity {
         startActivityForResult(intent, SHOW_CAMERA);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == SHOW_CAMERA && resultCode == RESULT_OK) {
-            Bitmap thumbnail = data.getParcelableExtra("data");
-        }
+    private void saveNote() {
+        note.setCourse((CourseInfo) spinnerText.getSelectedItem());
+        note.setTitle(textTitle.getText().toString());
+        note.setText(textNote.getText().toString());
     }
 }

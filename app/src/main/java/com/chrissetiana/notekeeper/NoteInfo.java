@@ -28,11 +28,11 @@ class NoteInfo implements Parcelable {
         }
     };
 
-    public CourseInfo getCourseInfo() {
+    CourseInfo getCourse() {
         return courseInfo;
     }
 
-    private void setCourseInfo(CourseInfo courseInfo) {
+    void setCourse(CourseInfo courseInfo) {
         this.courseInfo = courseInfo;
     }
 
@@ -40,7 +40,7 @@ class NoteInfo implements Parcelable {
         return title;
     }
 
-    private void setTitle(String title) {
+    void setTitle(String title) {
         this.title = title;
     }
 
@@ -48,7 +48,7 @@ class NoteInfo implements Parcelable {
         return text;
     }
 
-    private void setText(String text) {
+    void setText(String text) {
         this.text = text;
     }
 

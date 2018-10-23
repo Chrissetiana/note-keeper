@@ -26,7 +26,7 @@ public class DataManager {
         return "chrissetiana@gmail.com";
     }
 
-    public List<NoteInfo> getNotes() {
+    List<NoteInfo> getNotes() {
         return notes;
     }
 
