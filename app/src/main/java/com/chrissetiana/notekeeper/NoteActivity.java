@@ -7,13 +7,15 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.Spinner;
 
 import java.util.List;
 
 public class NoteActivity extends AppCompatActivity {
     public static final String NOTE_INFO = "com.chrissetiana.notekeeper.NOTE_INFO";
-    private NoteInfo noteInfo;
+    private NoteInfo note;
+    private boolean isNewNote;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,11 +32,27 @@ public class NoteActivity extends AppCompatActivity {
         spinnerText.setAdapter(adapterCourses);
 
         readDisplayStateValues();
+
+        EditText textTitle = findViewById(R.id.text_title);
+        EditText textNote = findViewById(R.id.text_note);
+
+        if (!isNewNote) {
+            displayNote(spinnerText, textTitle, textNote);
+        }
+    }
+
+    private void displayNote(Spinner spinnerText, EditText textTitle, EditText textNote) {
+        List<CourseInfo> list = DataManager.getInstance().getCourses();
+        int courseIndex = list.indexOf(note.getCourseInfo());
+        spinnerText.setSelection(courseIndex);
+        textTitle.setText(note.getTitle());
+        textNote.setText(note.getText());
     }
 
     private void readDisplayStateValues() {
         Intent intent = getIntent();
-        noteInfo = intent.getParcelableExtra(NOTE_INFO);
+        note = intent.getParcelableExtra(NOTE_INFO);
+        isNewNote = note == null;
     }
 
     @Override
