@@ -26,6 +26,7 @@ public class NoteActivity extends AppCompatActivity {
     private EditText textTitle;
     private EditText textNote;
     private int newPosition;
+    private boolean isCancelling;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +68,9 @@ public class NoteActivity extends AppCompatActivity {
         } else if (id == R.id.action_add_image) {
 //            addImage();
             return true;
+        } else if (id == R.id.action_cancel) {
+            isCancelling = true;
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
@@ -82,7 +86,12 @@ public class NoteActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        saveNote();
+
+        if (isCancelling) {
+            DataManager.getInstance().removeNote(newPosition);
+        } else {
+            saveNote();
+        }
     }
 
     private void displayNote(Spinner spinnerText, EditText textTitle, EditText textNote) {

@@ -14,4 +14,10 @@
         android:orderInCategory="1"
         android:title="@string/menu_add_image"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_cancel"
+        android:orderInCategory="1001"
+        android:title="@string/menu_cancel"
+        app:showAsAction="never" />
 </menu>
