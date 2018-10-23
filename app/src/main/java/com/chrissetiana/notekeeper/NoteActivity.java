@@ -1,7 +1,11 @@
 package com.chrissetiana.notekeeper;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -15,6 +19,7 @@ import java.util.List;
 public class NoteActivity extends AppCompatActivity {
     public static final String NOTE_POSITION = "com.chrissetiana.notekeeper.NOTE_POSITION";
     public static final int POSITION_NOT_SET = -1;
+    public static final int SHOW_CAMERA = 1;
     private NoteInfo note;
     private boolean isNewNote;
     private Spinner spinnerText;
@@ -75,6 +80,9 @@ public class NoteActivity extends AppCompatActivity {
         if (id == R.id.action_send_email) {
             sendEmail();
             return true;
+        } else if (id == R.id.action_add_image) {
+//            addImage();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -91,5 +99,18 @@ public class NoteActivity extends AppCompatActivity {
         intent.putExtra(Intent.EXTRA_SUBJECT, subject);
         intent.putExtra(Intent.EXTRA_TEXT, message);
         startActivity(intent);
+    }
+
+    private void addImage(Uri photoFile) {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoFile);
+        startActivityForResult(intent, SHOW_CAMERA);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == SHOW_CAMERA && resultCode == RESULT_OK) {
+            Bitmap thumbnail = data.getParcelableExtra("data");
+        }
     }
 }
