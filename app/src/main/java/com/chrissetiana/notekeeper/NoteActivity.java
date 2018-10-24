@@ -18,6 +18,9 @@ import java.util.List;
 
 public class NoteActivity extends AppCompatActivity {
     public static final String NOTE_POSITION = "com.chrissetiana.notekeeper.NOTE_POSITION";
+    public static final String ORIGINAL_NOTE_ID = "com.chrissetiana.notekeeper.NOTE_ID";
+    public static final String ORIGINAL_NOTE_TITLE = "com.chrissetiana.notekeeper.NOTE_TITLE";
+    public static final String ORIGINAL_NOTE_TEXT = "com.chrissetiana.notekeeper.NOTE_TEXT";
     public static final int POSITION_NOT_SET = -1;
     public static final int SHOW_CAMERA = 1;
     private NoteInfo note;
@@ -48,7 +51,11 @@ public class NoteActivity extends AppCompatActivity {
         spinnerText.setAdapter(adapterCourses);
 
         readDisplayStateValues();
-        saveOriginalStateValues();
+        if (savedInstanceState == null) {
+            saveOriginalStateValues();
+        } else {
+            restoreOriginalStateValues(savedInstanceState);
+        }
 
         textTitle = findViewById(R.id.text_title);
         textNote = findViewById(R.id.text_note);
@@ -56,6 +63,15 @@ public class NoteActivity extends AppCompatActivity {
         if (!isNewNote) {
             displayNote(spinnerText, textTitle, textNote);
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putString(ORIGINAL_NOTE_ID, originalNoteId);
+        outState.putString(ORIGINAL_NOTE_TITLE, originalNoteTitle);
+        outState.putString(ORIGINAL_NOTE_TEXT, originalNoteText);
     }
 
     @Override
@@ -132,6 +148,12 @@ public class NoteActivity extends AppCompatActivity {
         note.setCourse(course);
         note.setTitle(originalNoteTitle);
         note.setText(originalNoteText);
+    }
+
+    private void restoreOriginalStateValues(Bundle savedInstanceState) {
+        originalNoteId = savedInstanceState.getString(ORIGINAL_NOTE_ID);
+        originalNoteTitle = savedInstanceState.getString(ORIGINAL_NOTE_TITLE);
+        originalNoteText = savedInstanceState.getString(ORIGINAL_NOTE_TEXT);
     }
 
     private void displayNote(Spinner spinnerText, EditText textTitle, EditText textNote) {
