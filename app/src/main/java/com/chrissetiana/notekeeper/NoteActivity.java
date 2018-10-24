@@ -27,11 +27,15 @@ public class NoteActivity extends AppCompatActivity {
     private EditText textNote;
     private int newPosition;
     private boolean isCancelling;
+    private String originalNoteId;
+    private String originalNoteTitle;
+    private String originalNoteText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -39,10 +43,12 @@ public class NoteActivity extends AppCompatActivity {
 
         List<CourseInfo> courses = DataManager.getInstance().getCourses();
         ArrayAdapter<CourseInfo> adapterCourses = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, courses);
+
         adapterCourses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerText.setAdapter(adapterCourses);
 
         readDisplayStateValues();
+        saveOriginalStateValues();
 
         textTitle = findViewById(R.id.text_title);
         textNote = findViewById(R.id.text_note);
@@ -88,29 +94,53 @@ public class NoteActivity extends AppCompatActivity {
         super.onPause();
 
         if (isCancelling) {
-            DataManager.getInstance().removeNote(newPosition);
+            if (isNewNote) {
+                DataManager.getInstance().removeNote(newPosition);
+            } else {
+                storePreviousStateValues();
+            }
         } else {
             saveNote();
         }
     }
 
-    private void displayNote(Spinner spinnerText, EditText textTitle, EditText textNote) {
-        List<CourseInfo> list = DataManager.getInstance().getCourses();
-        int courseIndex = list.indexOf(note.getCourse());
-        spinnerText.setSelection(courseIndex);
-        textTitle.setText(note.getTitle());
-        textNote.setText(note.getText());
-    }
-
     private void readDisplayStateValues() {
         Intent intent = getIntent();
         int position = intent.getIntExtra(NOTE_POSITION, POSITION_NOT_SET);
+
         isNewNote = position == POSITION_NOT_SET;
+
         if (isNewNote) {
             createNote();
         } else {
             note = DataManager.getInstance().getNotes().get(position);
         }
+    }
+
+    private void saveOriginalStateValues() {
+        if (isNewNote) {
+            return;
+        }
+
+        originalNoteId = note.getCourse().getNoteId();
+        originalNoteTitle = note.getTitle();
+        originalNoteText = note.getText();
+    }
+
+    private void storePreviousStateValues() {
+        CourseInfo course = DataManager.getInstance().getCourse(originalNoteId);
+        note.setCourse(course);
+        note.setTitle(originalNoteTitle);
+        note.setText(originalNoteText);
+    }
+
+    private void displayNote(Spinner spinnerText, EditText textTitle, EditText textNote) {
+        List<CourseInfo> list = DataManager.getInstance().getCourses();
+        int courseIndex = list.indexOf(note.getCourse());
+
+        spinnerText.setSelection(courseIndex);
+        textTitle.setText(note.getTitle());
+        textNote.setText(note.getText());
     }
 
     private void createNote() {
@@ -119,8 +149,15 @@ public class NoteActivity extends AppCompatActivity {
         note = dataManager.getNotes().get(newPosition);
     }
 
+    private void saveNote() {
+        note.setCourse((CourseInfo) spinnerText.getSelectedItem());
+        note.setTitle(textTitle.getText().toString());
+        note.setText(textNote.getText().toString());
+    }
+
     private void sendEmail() {
         CourseInfo course = (CourseInfo) spinnerText.getSelectedItem();
+
         String subject = textTitle.getText().toString();
         String note = textNote.getText().toString();
         String message = "Checkout what I learned in the PluralSight course \"" + course.getNoteTitle() + "\"\n" + note;
@@ -136,11 +173,5 @@ public class NoteActivity extends AppCompatActivity {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, photoFile);
         startActivityForResult(intent, SHOW_CAMERA);
-    }
-
-    private void saveNote() {
-        note.setCourse((CourseInfo) spinnerText.getSelectedItem());
-        note.setTitle(textTitle.getText().toString());
-        note.setText(textNote.getText().toString());
     }
 }
