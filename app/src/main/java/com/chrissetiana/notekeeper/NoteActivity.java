@@ -137,7 +137,7 @@ public class NoteActivity extends AppCompatActivity {
             return;
         }
 
-        originalNoteId = note.getCourse().getNoteId();
+        originalNoteId = note.getCourse().getCourseId();
         originalNoteTitle = note.getTitle();
         originalNoteText = note.getText();
     }

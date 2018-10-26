@@ -5,16 +5,6 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 class NoteInfo implements Parcelable {
-    private CourseInfo courseInfo;
-    private String title;
-    private String text;
-
-    NoteInfo(CourseInfo courseInfo, String title, String text) {
-        this.courseInfo = courseInfo;
-        this.title = title;
-        this.text = text;
-    }
-
     public final static Parcelable.Creator<NoteInfo> CREATOR = new Parcelable.Creator<NoteInfo>() {
 
         @Override
@@ -27,6 +17,21 @@ class NoteInfo implements Parcelable {
             return new NoteInfo[size];
         }
     };
+    private CourseInfo courseInfo;
+    private String title;
+    private String text;
+
+    NoteInfo(CourseInfo courseInfo, String title, String text) {
+        this.courseInfo = courseInfo;
+        this.title = title;
+        this.text = text;
+    }
+
+    private NoteInfo(Parcel source) {
+        courseInfo = source.readParcelable(CourseInfo.class.getClassLoader());
+        title = source.readString();
+        text = source.readString();
+    }
 
     CourseInfo getCourse() {
         return courseInfo;
@@ -53,13 +58,7 @@ class NoteInfo implements Parcelable {
     }
 
     private String getCompareKey() {
-        return courseInfo.getNoteId() + "|" + title + "|" + text;
-    }
-
-    private NoteInfo(Parcel source) {
-        courseInfo = source.readParcelable(CourseInfo.class.getClassLoader());
-        title = source.readString();
-        text = source.readString();
+        return courseInfo.getCourseId() + "|" + title + "|" + text;
     }
 
     @Override
@@ -74,8 +73,8 @@ class NoteInfo implements Parcelable {
     }
 
     @Override
-    public boolean equals( Object o) {
-        if(this == o) {
+    public boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
 

@@ -5,14 +5,6 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 class ModuleInfo implements Parcelable {
-    private final String moduleId;
-    private final String moduleTitle;
-    private boolean isComplete = false;
-
-    public ModuleInfo(String moduleId, String moduleTitle) {
-        this(moduleId, moduleTitle, false);
-    }
-
     public static final Creator<ModuleInfo> CREATOR = new Creator<ModuleInfo>() {
         @Override
         public ModuleInfo createFromParcel(Parcel in) {
@@ -24,6 +16,13 @@ class ModuleInfo implements Parcelable {
             return new ModuleInfo[size];
         }
     };
+    private final String moduleId;
+    private final String moduleTitle;
+    private boolean isComplete = false;
+
+    public ModuleInfo(String moduleId, String moduleTitle) {
+        this(moduleId, moduleTitle, false);
+    }
 
     private ModuleInfo(String moduleId, String moduleTitle, boolean isComplete) {
         this.moduleId = moduleId;
@@ -37,12 +36,12 @@ class ModuleInfo implements Parcelable {
         isComplete = source.readByte() == 1;
     }
 
-    public String getModuleTitle() {
-        return moduleTitle;
-    }
-
     public static Creator<ModuleInfo> getCREATOR() {
         return CREATOR;
+    }
+
+    public String getModuleTitle() {
+        return moduleTitle;
     }
 
     String getModuleId() {

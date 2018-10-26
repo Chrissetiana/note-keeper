@@ -8,16 +8,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class CourseInfo implements Parcelable {
-    private final String noteId;
-    private final String noteTitle;
-    private final List<ModuleInfo> modules;
-
-    public CourseInfo(String noteId, String noteTitle, List<ModuleInfo> modules) {
-        this.noteId = noteId;
-        this.noteTitle = noteTitle;
-        this.modules = modules;
-    }
-
     public static final Creator<CourseInfo> CREATOR = new Creator<CourseInfo>() {
         @Override
         public CourseInfo createFromParcel(Parcel in) {
@@ -29,16 +19,25 @@ public final class CourseInfo implements Parcelable {
             return new CourseInfo[size];
         }
     };
+    private final String courseId;
+    private final String noteTitle;
+    private final List<ModuleInfo> modules;
+
+    public CourseInfo(String courseId, String noteTitle, List<ModuleInfo> modules) {
+        this.courseId = courseId;
+        this.noteTitle = noteTitle;
+        this.modules = modules;
+    }
 
     private CourseInfo(Parcel source) {
-        noteId = source.readString();
+        courseId = source.readString();
         noteTitle = source.readString();
         modules = new ArrayList<>();
         source.readTypedList(modules, ModuleInfo.CREATOR);
     }
 
-    String getNoteId() {
-        return noteId;
+    String getCourseId() {
+        return courseId;
     }
 
     public String getNoteTitle() {
@@ -52,7 +51,7 @@ public final class CourseInfo implements Parcelable {
     public boolean[] getModulesCompletionStatus() {
         boolean[] status = new boolean[modules.size()];
 
-        for(int i=0; i<modules.size(); i++) {
+        for (int i = 0; i < modules.size(); i++) {
             status[i] = modules.get(i).isComplete();
         }
 
@@ -60,14 +59,14 @@ public final class CourseInfo implements Parcelable {
     }
 
     public void setModulesCompletionStatus(boolean[] status) {
-        for(int i=0; i<modules.size(); i++) {
+        for (int i = 0; i < modules.size(); i++) {
             modules.get(i).setComplete(status[i]);
         }
     }
 
     public ModuleInfo getModule(String moduleId) {
-        for(ModuleInfo moduleInfo: modules) {
-            if(moduleId.equals(moduleInfo.getModuleId())) {
+        for (ModuleInfo moduleInfo : modules) {
+            if (moduleId.equals(moduleInfo.getModuleId())) {
                 return moduleInfo;
             }
         }
@@ -84,16 +83,21 @@ public final class CourseInfo implements Parcelable {
     @Override
     public boolean equals(Object o) {
         if (this == o) {
-           return true;
-       }
+            return true;
+        }
 
         if (o == null || getClass() != o.getClass()) {
-           return false;
-       }
+            return false;
+        }
 
         CourseInfo that = (CourseInfo) o;
 
-       return noteId.equals(that.noteId);
+        return courseId.equals(that.courseId);
+    }
+
+    @Override
+    public int hashCode() {
+        return courseId.hashCode();
     }
 
     @Override
@@ -103,8 +107,8 @@ public final class CourseInfo implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-//        dest.writeTypedList(modules);
-        dest.writeString(noteId);
+        dest.writeString(courseId);
         dest.writeString(noteTitle);
+        dest.writeTypedList(modules);
     }
 }
