@@ -1,10 +1,18 @@
 package com.chrissetiana.notekeeper;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class DataManagerTest {
+
+    @Before
+    public void setup() {
+        DataManager dm = DataManager.getInstance();
+        dm.getNotes().clear();
+        dm.initializeExampleNotes();
+    }
 
     @Test
     public void createNewNote() {
