@@ -8,11 +8,11 @@ public class DataManager {
     private List<CourseInfo> courses = new ArrayList<>();
     private List<NoteInfo> notes = new ArrayList<>();
 
-    static DataManager getInstance() {
+    public static DataManager getInstance() {
         if(ourInstance == null) {
             ourInstance = new DataManager();
-//            ourInstance.initializeCourse();
-//            ourInstance.initializeExampleNotes();
+            ourInstance.initializeCourse();
+            ourInstance.initializeExampleNotes();
         }
 
         return ourInstance;
@@ -26,7 +26,7 @@ public class DataManager {
         return "chrissetiana@gmail.com";
     }
 
-    List<NoteInfo> getNotes() {
+    public List<NoteInfo> getNotes() {
         return notes;
     }
 
@@ -50,7 +50,7 @@ public class DataManager {
     notes.remove(index);
     }
 
-    List<CourseInfo> getCourses() {
+    public List<CourseInfo> getCourses() {
         return courses;
     }
 
