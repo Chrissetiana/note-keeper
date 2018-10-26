@@ -122,15 +122,14 @@ public class NoteActivity extends AppCompatActivity {
 
     private void readDisplayStateValues() {
         Intent intent = getIntent();
-        int position = intent.getIntExtra(NOTE_POSITION, POSITION_NOT_SET);
+        newPosition = intent.getIntExtra(NOTE_POSITION, POSITION_NOT_SET);
 
-        isNewNote = position == POSITION_NOT_SET;
+        isNewNote = newPosition == POSITION_NOT_SET;
 
         if (isNewNote) {
             createNote();
-        } else {
-            note = DataManager.getInstance().getNotes().get(position);
         }
+        note = DataManager.getInstance().getNotes().get(newPosition);
     }
 
     private void saveOriginalStateValues() {
@@ -168,7 +167,6 @@ public class NoteActivity extends AppCompatActivity {
     private void createNote() {
         DataManager dataManager = DataManager.getInstance();
         newPosition = dataManager.createNewNote();
-        note = dataManager.getNotes().get(newPosition);
     }
 
     private void saveNote() {
