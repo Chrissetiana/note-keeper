@@ -26,7 +26,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(AndroidJUnit4.class)
 public class NoteCreationTest {
 
-    static DataManager dataManager;
+    private static DataManager dataManager;
 
     @Rule
     public ActivityTestRule<NoteListActivity> rule = new ActivityTestRule<>(NoteListActivity.class);
@@ -38,7 +38,7 @@ public class NoteCreationTest {
         final String noteText = "This is the body of our test note";
 
         onView(withId(R.id.fab)).perform(click());
-        onView(withId(R.id.spinner_topic)).perform(click());
+        onView(withId(R.id.spinner_courses)).perform(click());
 
         onData(allOf(instanceOf(CourseInfo.class), equalTo(course)))
                 .perform(click())
