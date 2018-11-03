@@ -8,4 +8,6 @@
     <string name="menu_send_email">Send Email</string>
     <string name="menu_add_image">Add image</string>
     <string name="menu_cancel">Cancel</string>
+    <string name="text_course">TextView</string>
+    <string name="text_title">TextView</string>
 </resources>
