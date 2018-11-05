@@ -28,7 +28,7 @@ public class NoteActivity extends AppCompatActivity {
     private Spinner spinnerText;
     private EditText textTitle;
     private EditText textNote;
-    private int newPosition;
+    private int notePosition;
     private boolean isCancelling;
     private String originalNoteId;
     private String originalNoteTitle;
@@ -75,8 +75,18 @@ public class NoteActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem menuItem = menu.findItem(R.id.action_next);
+        int lastNoteIndex = DataManager.getInstance().getNotes().size() - 1;
+
+        menuItem.setEnabled(notePosition < lastNoteIndex);
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
+        getMenuInflater().inflate(R.menu.menu_note, menu);
         return true;
     }
 
@@ -90,6 +100,8 @@ public class NoteActivity extends AppCompatActivity {
         } else if (id == R.id.action_add_image) {
 //            addImage();
             return true;
+        } else if (id == R.id.action_next) {
+            moveNext();
         } else if (id == R.id.action_cancel) {
             isCancelling = true;
             finish();
@@ -111,7 +123,7 @@ public class NoteActivity extends AppCompatActivity {
 
         if (isCancelling) {
             if (isNewNote) {
-                DataManager.getInstance().removeNote(newPosition);
+                DataManager.getInstance().removeNote(notePosition);
             } else {
                 storePreviousStateValues();
             }
@@ -122,14 +134,14 @@ public class NoteActivity extends AppCompatActivity {
 
     private void readDisplayStateValues() {
         Intent intent = getIntent();
-        newPosition = intent.getIntExtra(NOTE_POSITION, POSITION_NOT_SET);
+        notePosition = intent.getIntExtra(NOTE_POSITION, POSITION_NOT_SET);
 
-        isNewNote = newPosition == POSITION_NOT_SET;
+        isNewNote = notePosition == POSITION_NOT_SET;
 
         if (isNewNote) {
             createNote();
         }
-        note = DataManager.getInstance().getNotes().get(newPosition);
+        note = DataManager.getInstance().getNotes().get(notePosition);
     }
 
     private void saveOriginalStateValues() {
@@ -166,7 +178,7 @@ public class NoteActivity extends AppCompatActivity {
 
     private void createNote() {
         DataManager dataManager = DataManager.getInstance();
-        newPosition = dataManager.createNewNote();
+        notePosition = dataManager.createNewNote();
     }
 
     private void saveNote() {
@@ -193,5 +205,15 @@ public class NoteActivity extends AppCompatActivity {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, photoFile);
         startActivityForResult(intent, SHOW_CAMERA);
+    }
+
+    private void moveNext() {
+        saveNote();
+
+        ++notePosition;
+        note = DataManager.getInstance().getNotes().get(notePosition);
+
+        saveOriginalStateValues();
+        displayNote(spinnerText, textTitle, textNote);
     }
 }

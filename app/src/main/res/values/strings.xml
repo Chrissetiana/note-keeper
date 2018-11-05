@@ -10,4 +10,5 @@
     <string name="menu_cancel">Cancel</string>
     <string name="text_course">TextView</string>
     <string name="text_title">TextView</string>
+    <string name="menu_next">Next</string>
 </resources>
