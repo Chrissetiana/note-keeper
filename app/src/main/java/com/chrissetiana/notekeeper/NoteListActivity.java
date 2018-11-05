@@ -13,6 +13,8 @@ import java.util.List;
 
 public class NoteListActivity extends AppCompatActivity {
 
+    private NoteRecyclerAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,6 +36,7 @@ public class NoteListActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        adapter.notifyDataSetChanged();
     }
 
     private void initializeDisplayContent() {
@@ -42,7 +45,7 @@ public class NoteListActivity extends AppCompatActivity {
         recyclerNotes.setLayoutManager(notesLayoutManager);
 
         List<NoteInfo> notes = DataManager.getInstance().getNotes();
-        final NoteRecyclerAdapter adapter = new NoteRecyclerAdapter(this, notes);
+        adapter = new NoteRecyclerAdapter(this, notes);
         recyclerNotes.setAdapter(adapter);
     }
 }

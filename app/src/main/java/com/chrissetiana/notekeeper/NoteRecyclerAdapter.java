@@ -1,6 +1,7 @@
 package com.chrissetiana.notekeeper;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,10 +29,11 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(ViewHolder holder, int position) {
         NoteInfo note = notes.get(position);
-        viewHolder.textCourse.setText(note.getCourse().getNoteTitle());
-        viewHolder.textTitle.setText(note.getTitle());
+        holder.textCourse.setText(note.getCourse().getNoteTitle());
+        holder.textTitle.setText(note.getTitle());
+        holder.currentPosition = position;
     }
 
     @Override
@@ -43,12 +45,22 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
 
         public final TextView textCourse;
         public final TextView textTitle;
+        public int currentPosition;
 
         public ViewHolder(View itemView) {
             super(itemView);
 
             textCourse = itemView.findViewById(R.id.text_course);
             textTitle = itemView.findViewById(R.id.text_title);
+
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent = new Intent(context, NoteActivity.class);
+                    intent.putExtra(NoteActivity.NOTE_POSITION, currentPosition);
+                    context.startActivity(intent);
+                }
+            });
         }
     }
 
