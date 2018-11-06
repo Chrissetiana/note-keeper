@@ -94,7 +94,7 @@ public class NoteActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
-        if (id == R.id.action_send_email) {
+        if (id == R.id.action_send_mail) {
             sendEmail();
             return true;
         } else if (id == R.id.action_add_image) {
