@@ -22,6 +22,8 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     private NoteRecyclerAdapter adapter;
+    private RecyclerView recyclerItems;
+    private LinearLayoutManager notesLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,13 +59,21 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void initializeDisplayContent() {
-        final RecyclerView recyclerNotes = findViewById(R.id.list_items);
-        final LinearLayoutManager notesLayoutManager = new LinearLayoutManager(this);
-        recyclerNotes.setLayoutManager(notesLayoutManager);
-
+        recyclerItems = findViewById(R.id.list_items);
+        notesLayoutManager = new LinearLayoutManager(this);
         List<NoteInfo> notes = DataManager.getInstance().getNotes();
         adapter = new NoteRecyclerAdapter(this, notes);
-        recyclerNotes.setAdapter(adapter);
+
+        displayNotes();
+    }
+
+    private void displayNotes() {
+        recyclerItems.setLayoutManager(notesLayoutManager);
+        recyclerItems.setAdapter(adapter);
+
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        Menu menu = navigationView.getMenu();
+        menu.findItem(R.id.nav_notes).setChecked(true);
     }
 
     @Override
@@ -105,7 +115,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_notes) {
-            handleNotes("Notes");
+            displayNotes();
         } else if (id == R.id.nav_courses) {
             handleNotes("Courses");
         } else if (id == R.id.nav_share) {

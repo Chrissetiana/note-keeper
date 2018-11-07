@@ -40,7 +40,7 @@ public final class CourseInfo implements Parcelable {
         return courseId;
     }
 
-    public String getNoteTitle() {
+    public String getTitle() {
         return noteTitle;
     }
 

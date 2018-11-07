@@ -42,7 +42,7 @@ public class NoteCreationTest {
 
         onData(allOf(instanceOf(CourseInfo.class), equalTo(course)))
                 .perform(click())
-                .check(matches(withSpinnerText(containsString(course.getNoteTitle()))));
+                .check(matches(withSpinnerText(containsString(course.getTitle()))));
 
         onView(withId(R.id.text_title))
                 .perform(typeText(noteTitle))
