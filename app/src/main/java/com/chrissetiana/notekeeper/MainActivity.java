@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity
 
         List<CourseInfo> courses = DataManager.getInstance().getCourses();
         courseAdapter = new CourseRecyclerAdapter(this, courses);
-        courseLayoutManager = new GridLayoutManager(this, 2);
+        courseLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.layout_manager));
 
         displayNotes();
         displayCourses();
@@ -131,7 +131,6 @@ public class MainActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
 
         if (id == R.id.nav_notes) {
@@ -139,9 +138,9 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_courses) {
             displayCourses();
         } else if (id == R.id.nav_share) {
-            handleNotes("Share");
+            handleNotes(R.string.nav_share);
         } else if (id == R.id.nav_send) {
-            handleNotes("Send");
+            handleNotes(R.string.nav_send);
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -149,8 +148,8 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void handleNotes(String message) {
+    private void handleNotes(int messageId) {
         View view = findViewById(R.id.list_items);
-        Snackbar.make(view, message, Snackbar.LENGTH_LONG).show();
+        Snackbar.make(view, messageId, Snackbar.LENGTH_LONG).show();
     }
 }
