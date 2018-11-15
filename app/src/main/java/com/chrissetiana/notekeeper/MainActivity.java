@@ -1,6 +1,7 @@
 package com.chrissetiana.notekeeper;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -17,6 +18,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -64,6 +66,22 @@ public class MainActivity extends AppCompatActivity
     protected void onResume() {
         super.onResume();
         noteAdapter.notifyDataSetChanged();
+        updateNaveHeader();
+    }
+
+    private void updateNaveHeader() {
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        View headerView = navigationView.getHeaderView(0);
+
+        TextView userName = headerView.findViewById(R.id.text_user_name);
+        TextView userEmail = headerView.findViewById(R.id.text_user_email);
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String name = sharedPreferences.getString("user_name", "");
+        String email = sharedPreferences.getString("user_email", "");
+
+        userName.setText(name);
+        userEmail.setText(email);
     }
 
     private void initializeDisplayContent() {
@@ -144,7 +162,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_courses) {
             displayCourses();
         } else if (id == R.id.nav_share) {
-            handleNotes(R.string.nav_share);
+            handleShare();
         } else if (id == R.id.nav_send) {
             handleNotes(R.string.nav_send);
         }
@@ -152,6 +170,13 @@ public class MainActivity extends AppCompatActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    private void handleShare() {
+        View view = findViewById(R.id.list_items);
+        Snackbar.make(view, "Share to " +
+                        PreferenceManager.getDefaultSharedPreferences(this).getString("user_favorite_social", ""),
+                Snackbar.LENGTH_LONG).show();
     }
 
     private void handleNotes(int messageId) {
