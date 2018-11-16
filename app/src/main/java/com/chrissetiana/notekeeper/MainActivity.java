@@ -2,6 +2,7 @@ package com.chrissetiana.notekeeper;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -30,13 +31,17 @@ public class MainActivity extends AppCompatActivity
     private LinearLayoutManager noteLayoutManager;
     private CourseRecyclerAdapter courseAdapter;
     private GridLayoutManager courseLayoutManager;
+    private NoteKeeperDatabaseHelper databaseHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        databaseHelper = new NoteKeeperDatabaseHelper(this);
 
         FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -67,6 +72,12 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
         noteAdapter.notifyDataSetChanged();
         updateNaveHeader();
+    }
+
+    @Override
+    protected void onDestroy() {
+        databaseHelper.close();
+        super.onDestroy();
     }
 
     private void updateNaveHeader() {
@@ -102,6 +113,8 @@ public class MainActivity extends AppCompatActivity
     private void displayNotes() {
         recyclerItems.setLayoutManager(noteLayoutManager);
         recyclerItems.setAdapter(noteAdapter);
+
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
 
         selectNavigationMenuItem(R.id.nav_notes);
     }
