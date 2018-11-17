@@ -16,8 +16,6 @@ import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
-import java.util.List;
-
 import static com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.CourseInfoEntry;
 import static com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.NoteInfoEntry;
 
@@ -251,13 +249,31 @@ public class NoteActivity extends AppCompatActivity {
         String courseTitle = noteCursor.getString(cursorTitlePos);
         String courseText = noteCursor.getString(cursorTextPos);
 
-        List<CourseInfo> list = DataManager.getInstance().getCourses();
-        CourseInfo courseInfo = DataManager.getInstance().getCourse(courseId);
-        int courseIndex = list.indexOf(courseInfo);
+        int courseIndex = getCourseIdIndex(courseId);
         spinnerText.setSelection(courseIndex);
 
         textTitle.setText(courseTitle);
         textNote.setText(courseText);
+    }
+
+    private int getCourseIdIndex(String courseId) {
+        Cursor cursor = adapterCourses.getCursor();
+        int courseIdPos = cursor.getColumnIndex(CourseInfoEntry.COLUMN_COURSE_ID);
+        int courseRowIndex = 0;
+        boolean more = cursor.moveToFirst();
+
+        while (more) {
+            String cursorId = cursor.getString(courseIdPos);
+
+            if (courseId.equals(cursorId)) {
+                break;
+            }
+
+            courseRowIndex++;
+            more = cursor.moveToNext();
+        }
+
+        return courseRowIndex;
     }
 
     private void createNote() {
