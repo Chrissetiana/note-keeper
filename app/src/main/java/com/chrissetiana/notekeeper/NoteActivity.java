@@ -12,12 +12,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
 import java.util.List;
 
+import static com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.CourseInfoEntry;
 import static com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.NoteInfoEntry;
 
 public class NoteActivity extends AppCompatActivity {
@@ -42,6 +43,7 @@ public class NoteActivity extends AppCompatActivity {
     private int cursorIdPos;
     private int cursorTitlePos;
     private int cursorTextPos;
+    private SimpleCursorAdapter adapterCourses;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,11 +57,15 @@ public class NoteActivity extends AppCompatActivity {
 
         spinnerText = findViewById(R.id.spinner_courses);
 
-        List<CourseInfo> courses = DataManager.getInstance().getCourses();
-        ArrayAdapter<CourseInfo> adapterCourses = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, courses);
+        final String[] str = {CourseInfoEntry.COLUMN_COURSE_TITLE};
+        final int[] text = {android.R.id.text1};
+        final int layout = android.R.layout.simple_spinner_item;
 
+        adapterCourses = new SimpleCursorAdapter(this, layout, null, str, text, 0);
         adapterCourses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerText.setAdapter(adapterCourses);
+
+        loadCourseData();
 
         readDisplayStateValues();
 
@@ -75,6 +81,28 @@ public class NoteActivity extends AppCompatActivity {
         if (!isNewNote) {
             loadNoteData();
         }
+    }
+
+    private void loadCourseData() {
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+
+        String[] courseColumns = {
+                CourseInfoEntry.COLUMN_COURSE_TITLE,
+                CourseInfoEntry.COLUMN_COURSE_ID,
+                CourseInfoEntry._ID
+        };
+
+        Cursor cursor = db.query(
+                CourseInfoEntry.TABLE_NAME,
+                courseColumns,
+                null,
+                null,
+                null,
+                null,
+                CourseInfoEntry.COLUMN_COURSE_TITLE
+        );
+
+        adapterCourses.changeCursor(cursor);
     }
 
     @Override
