@@ -21,18 +21,18 @@ import java.util.List;
 import static com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.NoteInfoEntry;
 
 public class NoteActivity extends AppCompatActivity {
-    public static final String NOTE_POSITION = "com.chrissetiana.notekeeper.NOTE_POSITION";
+    public static final String NOTE_ID = "com.chrissetiana.notekeeper.NOTE_ID";
     public static final String ORIGINAL_NOTE_ID = "com.chrissetiana.notekeeper.NOTE_ID";
     public static final String ORIGINAL_NOTE_TITLE = "com.chrissetiana.notekeeper.NOTE_TITLE";
     public static final String ORIGINAL_NOTE_TEXT = "com.chrissetiana.notekeeper.NOTE_TEXT";
-    public static final int POSITION_NOT_SET = -1;
+    public static final int ID_NOT_SET = -1;
     public static final int SHOW_CAMERA = 1;
     private NoteInfo note;
     private boolean isNewNote;
     private Spinner spinnerText;
     private EditText textTitle;
     private EditText textNote;
-    private int notePosition;
+    private int noteId;
     private boolean isCancelling;
     private String originalNoteId;
     private String originalNoteTitle;
@@ -62,6 +62,7 @@ public class NoteActivity extends AppCompatActivity {
         spinnerText.setAdapter(adapterCourses);
 
         readDisplayStateValues();
+
         if (savedInstanceState == null) {
             saveOriginalStateValues();
         } else {
@@ -88,8 +89,8 @@ public class NoteActivity extends AppCompatActivity {
         String courseId = "android_intents";
         String titleStart = "dynamic";
 
-        String selection = NoteInfoEntry.COLUMN_COURSE_ID + " = ? AND " + NoteInfoEntry.COLUMN_NOTE_TITLE + " LIKE ? ";
-        String[] selectionArgs = {courseId, titleStart + "%"};
+        String selection = NoteInfoEntry._ID + " = ? AND " + NoteInfoEntry.COLUMN_NOTE_TITLE + " LIKE ? ";
+        String[] selectionArgs = {Integer.toString(noteId)};
         String[] columns = {
                 NoteInfoEntry.COLUMN_COURSE_ID,
                 NoteInfoEntry.COLUMN_NOTE_TITLE,
@@ -128,7 +129,7 @@ public class NoteActivity extends AppCompatActivity {
         MenuItem menuItem = menu.findItem(R.id.action_next);
         int lastNoteIndex = DataManager.getInstance().getNotes().size() - 1;
 
-        menuItem.setEnabled(notePosition < lastNoteIndex);
+        menuItem.setEnabled(noteId < lastNoteIndex);
 
         return super.onPrepareOptionsMenu(menu);
     }
@@ -172,7 +173,7 @@ public class NoteActivity extends AppCompatActivity {
 
         if (isCancelling) {
             if (isNewNote) {
-                DataManager.getInstance().removeNote(notePosition);
+                DataManager.getInstance().removeNote(noteId);
             } else {
                 storePreviousStateValues();
             }
@@ -183,14 +184,15 @@ public class NoteActivity extends AppCompatActivity {
 
     private void readDisplayStateValues() {
         Intent intent = getIntent();
-        notePosition = intent.getIntExtra(NOTE_POSITION, POSITION_NOT_SET);
+        noteId = intent.getIntExtra(NOTE_ID, ID_NOT_SET);
 
-        isNewNote = notePosition == POSITION_NOT_SET;
+        isNewNote = noteId == ID_NOT_SET;
 
         if (isNewNote) {
             createNote();
         }
-        note = DataManager.getInstance().getNotes().get(notePosition);
+
+//        note = DataManager.getInstance().getNotes().get(noteId);
     }
 
     private void saveOriginalStateValues() {
@@ -232,7 +234,7 @@ public class NoteActivity extends AppCompatActivity {
 
     private void createNote() {
         DataManager dataManager = DataManager.getInstance();
-        notePosition = dataManager.createNewNote();
+        noteId = dataManager.createNewNote();
     }
 
     private void saveNote() {
@@ -264,8 +266,8 @@ public class NoteActivity extends AppCompatActivity {
     private void moveNext() {
         saveNote();
 
-        ++notePosition;
-        note = DataManager.getInstance().getNotes().get(notePosition);
+        ++noteId;
+        note = DataManager.getInstance().getNotes().get(noteId);
 
         saveOriginalStateValues();
         displayNote();

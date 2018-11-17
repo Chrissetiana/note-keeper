@@ -20,11 +20,19 @@ class NoteInfo implements Parcelable {
     private CourseInfo courseInfo;
     private String title;
     private String text;
+    private int id;
 
     NoteInfo(CourseInfo courseInfo, String title, String text) {
         this.courseInfo = courseInfo;
         this.title = title;
         this.text = text;
+    }
+
+    NoteInfo(int id, CourseInfo courseInfo, String title, String text) {
+        this.courseInfo = courseInfo;
+        this.title = title;
+        this.text = text;
+        this.id = id;
     }
 
     private NoteInfo(Parcel source) {
@@ -55,6 +63,10 @@ class NoteInfo implements Parcelable {
 
     void setText(String text) {
         this.text = text;
+    }
+
+    public int getId() {
+        return id;
     }
 
     private String getCompareKey() {
