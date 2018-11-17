@@ -1,6 +1,8 @@
 package com.chrissetiana.notekeeper;
 
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,6 +17,8 @@ import android.widget.EditText;
 import android.widget.Spinner;
 
 import java.util.List;
+
+import static com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.NoteInfoEntry;
 
 public class NoteActivity extends AppCompatActivity {
     public static final String NOTE_POSITION = "com.chrissetiana.notekeeper.NOTE_POSITION";
@@ -33,6 +37,11 @@ public class NoteActivity extends AppCompatActivity {
     private String originalNoteId;
     private String originalNoteTitle;
     private String originalNoteText;
+    private NoteKeeperDatabaseHelper databaseHelper;
+    private Cursor noteCursor;
+    private int cursorIdPos;
+    private int cursorTitlePos;
+    private int cursorTextPos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,6 +50,8 @@ public class NoteActivity extends AppCompatActivity {
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        databaseHelper = new NoteKeeperDatabaseHelper(this);
 
         spinnerText = findViewById(R.id.spinner_courses);
 
@@ -61,8 +72,46 @@ public class NoteActivity extends AppCompatActivity {
         textNote = findViewById(R.id.text_note);
 
         if (!isNewNote) {
-            displayNote(spinnerText, textTitle, textNote);
+            loadNoteData();
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        databaseHelper.close();
+        super.onDestroy();
+    }
+
+    private void loadNoteData() {
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+
+        String courseId = "android_intents";
+        String titleStart = "dynamic";
+
+        String selection = NoteInfoEntry.COLUMN_COURSE_ID + " = ? AND " + NoteInfoEntry.COLUMN_NOTE_TITLE + " LIKE ? ";
+        String[] selectionArgs = {courseId, titleStart + "%"};
+        String[] columns = {
+                NoteInfoEntry.COLUMN_COURSE_ID,
+                NoteInfoEntry.COLUMN_NOTE_TITLE,
+                NoteInfoEntry.COLUMN_NOTE_TEXT
+        };
+
+        noteCursor = db.query(
+                NoteInfoEntry.TABLE_NAME,
+                columns,
+                selection,
+                selectionArgs,
+                null,
+                null,
+                null
+        );
+
+        cursorIdPos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_COURSE_ID);
+        cursorTitlePos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TITLE);
+        cursorTextPos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TEXT);
+
+        noteCursor.moveToNext();
+        displayNote();
     }
 
     @Override
@@ -167,13 +216,18 @@ public class NoteActivity extends AppCompatActivity {
         originalNoteText = savedInstanceState.getString(ORIGINAL_NOTE_TEXT);
     }
 
-    private void displayNote(Spinner spinnerText, EditText textTitle, EditText textNote) {
-        List<CourseInfo> list = DataManager.getInstance().getCourses();
-        int courseIndex = list.indexOf(note.getCourse());
+    private void displayNote() {
+        String courseId = noteCursor.getString(cursorIdPos);
+        String courseTitle = noteCursor.getString(cursorTitlePos);
+        String courseText = noteCursor.getString(cursorTextPos);
 
+        List<CourseInfo> list = DataManager.getInstance().getCourses();
+        CourseInfo courseInfo = DataManager.getInstance().getCourse(courseId);
+        int courseIndex = list.indexOf(courseInfo);
         spinnerText.setSelection(courseIndex);
-        textTitle.setText(note.getTitle());
-        textNote.setText(note.getText());
+
+        textTitle.setText(courseTitle);
+        textNote.setText(courseText);
     }
 
     private void createNote() {
@@ -214,6 +268,6 @@ public class NoteActivity extends AppCompatActivity {
         note = DataManager.getInstance().getNotes().get(notePosition);
 
         saveOriginalStateValues();
-        displayNote(spinnerText, textTitle, textNote);
+        displayNote();
     }
 }
