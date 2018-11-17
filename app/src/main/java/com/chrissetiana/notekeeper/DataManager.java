@@ -41,13 +41,14 @@ public class DataManager {
                 null,
                 null,
                 null,
-                null);
+                CourseInfoEntry.COLUMN_COURSE_TITLE + " DESC");
         loadCoursesFromDatabase(cursorCourses);
 
         final String[] columnsNotes = {
                 NoteInfoEntry.COLUMN_NOTE_TITLE,
                 NoteInfoEntry.COLUMN_NOTE_TEXT,
                 NoteInfoEntry.COLUMN_COURSE_ID};
+        final String orderBy = NoteInfoEntry.COLUMN_COURSE_ID + "," + NoteInfoEntry.COLUMN_NOTE_TITLE;
         final Cursor cursorNotes = db.query(
                 NoteInfoEntry.TABLE_NAME,
                 columnsNotes,
@@ -55,7 +56,7 @@ public class DataManager {
                 null,
                 null,
                 null,
-                null);
+                orderBy);
         loadNotesFromDatabase(cursorNotes);
     }
 
