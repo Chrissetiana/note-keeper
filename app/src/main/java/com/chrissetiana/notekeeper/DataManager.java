@@ -31,11 +31,71 @@ public class DataManager {
     public static void loadFromDatabase(NoteKeeperDatabaseHelper helper) {
         SQLiteDatabase db = helper.getReadableDatabase();
 
-        final String[] columnsCourse = {CourseInfoEntry.COLUMN_COURSE_ID, CourseInfoEntry.COLUMN_COURSE_TITLE};
-        final String[] columnsNotes = {NoteInfoEntry.COLUMN_NOTE_TITLE, NoteInfoEntry.COLUMN_NOTE_TEXT, NoteInfoEntry.COLUMN_COURSE_ID};
+        final String[] columnsCourse = {
+                CourseInfoEntry.COLUMN_COURSE_ID,
+                CourseInfoEntry.COLUMN_COURSE_TITLE};
+        final Cursor cursorCourses = db.query(
+                CourseInfoEntry.TABLE_NAME,
+                columnsCourse,
+                null,
+                null,
+                null,
+                null,
+                null);
+        loadCoursesFromDatabase(cursorCourses);
 
-        final Cursor cursorCourses = db.query(CourseInfoEntry.TABLE_NAME, columnsCourse, null, null, null, null, null);
-        final Cursor cursorNotes = db.query(NoteInfoEntry.TABLE_NAME, columnsNotes, null, null, null, null, null);
+        final String[] columnsNotes = {
+                NoteInfoEntry.COLUMN_NOTE_TITLE,
+                NoteInfoEntry.COLUMN_NOTE_TEXT,
+                NoteInfoEntry.COLUMN_COURSE_ID};
+        final Cursor cursorNotes = db.query(
+                NoteInfoEntry.TABLE_NAME,
+                columnsNotes,
+                null,
+                null,
+                null,
+                null,
+                null);
+        loadNotesFromDatabase(cursorNotes);
+    }
+
+    private static void loadNotesFromDatabase(Cursor cursor) {
+        int noteTitlePos = cursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TITLE);
+        int noteTextPos = cursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TEXT);
+        int courseIdPos = cursor.getColumnIndex(NoteInfoEntry.COLUMN_COURSE_ID);
+
+        DataManager dm = getInstance();
+        dm.notes.clear();
+
+        while (cursor.moveToNext()) {
+            String noteTitle = cursor.getString(noteTitlePos);
+            String noteText = cursor.getString(noteTextPos);
+            String courseId = cursor.getString(courseIdPos);
+
+            CourseInfo noteCourse = dm.getCourse(courseId);
+            NoteInfo noteInfo = new NoteInfo(noteCourse, noteTitle, noteText);
+            dm.notes.add(noteInfo);
+        }
+
+        cursor.close();
+    }
+
+    private static void loadCoursesFromDatabase(Cursor cursor) {
+        int courseIdPos = cursor.getColumnIndex(CourseInfoEntry.COLUMN_COURSE_ID);
+        int courseTitlePos = cursor.getColumnIndex(CourseInfoEntry.COLUMN_COURSE_TITLE);
+
+        DataManager dm = getInstance();
+        dm.courses.clear();
+
+        while (cursor.moveToNext()) {
+            String courseId = cursor.getString(courseIdPos);
+            String courseTitle = cursor.getString(courseTitlePos);
+
+            CourseInfo courseInfo = new CourseInfo(courseId, courseTitle, null);
+            dm.courses.add(courseInfo);
+        }
+
+        cursor.close();
     }
 
     public String getCurrentUserName() {
