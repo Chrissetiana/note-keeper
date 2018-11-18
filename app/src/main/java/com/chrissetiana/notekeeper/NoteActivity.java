@@ -1,5 +1,6 @@
 package com.chrissetiana.notekeeper;
 
+import android.annotation.SuppressLint;
 import android.app.LoaderManager;
 import android.content.Intent;
 import android.content.Loader;
@@ -10,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -29,6 +31,7 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
     public static final int ID_NOT_SET = -1;
     public static final int SHOW_CAMERA = 1;
     public static final int LOADER_NOTES = 0;
+    public static final int LOADER_COURSES = 1;
     private NoteInfo note;
     private boolean isNewNote;
     private Spinner spinnerText;
@@ -66,7 +69,7 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
         adapterCourses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerText.setAdapter(adapterCourses);
 
-        loadCourseData();
+        getLoaderManager().initLoader(LOADER_COURSES, null, this);
 
         readDisplayStateValues();
 
@@ -123,18 +126,11 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
         String[] columns = {
                 NoteInfoEntry.COLUMN_COURSE_ID,
                 NoteInfoEntry.COLUMN_NOTE_TITLE,
-                NoteInfoEntry.COLUMN_NOTE_TEXT
-        };
+                NoteInfoEntry.COLUMN_NOTE_TEXT};
 
-        noteCursor = db.query(
-                NoteInfoEntry.TABLE_NAME,
-                columns,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                null
-        );
+        noteCursor = db.query(NoteInfoEntry.TABLE_NAME,
+                columns, selection, selectionArgs,
+                null, null, null);
 
         cursorIdPos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_COURSE_ID);
         cursorTitlePos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TITLE);
@@ -322,16 +318,93 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        return null;
+        CursorLoader loader = null;
+
+        if (id == LOADER_NOTES) {
+            loader = createLoaderNotes();
+        } else if (id == LOADER_COURSES) {
+            loader = createLoaderCourses();
+        }
+
+        return loader;
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private CursorLoader createLoaderCourses() {
+        return new CursorLoader(this) {
+            @Override
+            public Cursor loadInBackground() {
+                SQLiteDatabase db = databaseHelper.getReadableDatabase();
+
+                String courseId = "android_intents";
+                String titleStart = "dynamic";
+
+                String selection = NoteInfoEntry._ID + " = ? AND " + NoteInfoEntry.COLUMN_NOTE_TITLE + " LIKE ? ";
+                String[] selectionArgs = {Integer.toString(noteId)};
+                String[] columns = {
+                        NoteInfoEntry.COLUMN_COURSE_ID,
+                        NoteInfoEntry.COLUMN_NOTE_TITLE,
+                        NoteInfoEntry.COLUMN_NOTE_TEXT};
+
+                return db.query(NoteInfoEntry.TABLE_NAME,
+                        columns, selection, selectionArgs,
+                        null, null, null);
+            }
+        };
+    }
+
+    @SuppressLint("StaticFieldLeak")
+    private CursorLoader createLoaderNotes() {
+        return new CursorLoader(this) {
+            @Override
+            public Cursor loadInBackground() {
+                SQLiteDatabase db = databaseHelper.getReadableDatabase();
+
+                String courseId = "android_intents";
+                String titleStart = "dynamic";
+
+                String selection = NoteInfoEntry._ID + " = ? AND " + NoteInfoEntry.COLUMN_NOTE_TITLE + " LIKE ? ";
+                String[] selectionArgs = {Integer.toString(noteId)};
+                String[] columns = {
+                        NoteInfoEntry.COLUMN_COURSE_ID,
+                        NoteInfoEntry.COLUMN_NOTE_TITLE,
+                        NoteInfoEntry.COLUMN_NOTE_TEXT};
+
+                return db.query(NoteInfoEntry.TABLE_NAME,
+                        columns, selection, selectionArgs,
+                        null, null, null);
+            }
+        };
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        if (loader.getId() == LOADER_NOTES) {
+            loadFinishedNotes(data);
+        } else if (loader.getId() == LOADER_COURSES) {
+            adapterCourses.changeCursor(data);
+        }
+    }
 
+    private void loadFinishedNotes(Cursor data) {
+        noteCursor = data;
+
+        cursorIdPos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_COURSE_ID);
+        cursorTitlePos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TITLE);
+        cursorTextPos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TEXT);
+
+        noteCursor.moveToNext();
+        displayNote();
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
-
+        if (loader.getId() == LOADER_NOTES) {
+            if (noteCursor != null) {
+                noteCursor.close();
+            }
+        } else if (loader.getId() == LOADER_COURSES) {
+            adapterCourses.changeCursor(null);
+        }
     }
 }
