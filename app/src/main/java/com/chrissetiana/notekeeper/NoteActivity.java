@@ -1,6 +1,8 @@
 package com.chrissetiana.notekeeper;
 
+import android.app.LoaderManager;
 import android.content.Intent;
+import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -19,13 +21,14 @@ import android.widget.Spinner;
 import static com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.CourseInfoEntry;
 import static com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.NoteInfoEntry;
 
-public class NoteActivity extends AppCompatActivity {
+public class NoteActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String NOTE_ID = "com.chrissetiana.notekeeper.NOTE_ID";
     public static final String ORIGINAL_NOTE_ID = "com.chrissetiana.notekeeper.NOTE_ID";
     public static final String ORIGINAL_NOTE_TITLE = "com.chrissetiana.notekeeper.NOTE_TITLE";
     public static final String ORIGINAL_NOTE_TEXT = "com.chrissetiana.notekeeper.NOTE_TEXT";
     public static final int ID_NOT_SET = -1;
     public static final int SHOW_CAMERA = 1;
+    public static final int LOADER_NOTES = 0;
     private NoteInfo note;
     private boolean isNewNote;
     private Spinner spinnerText;
@@ -77,7 +80,7 @@ public class NoteActivity extends AppCompatActivity {
         textNote = findViewById(R.id.text_note);
 
         if (!isNewNote) {
-            loadNoteData();
+            getLoaderManager().initLoader(LOADER_NOTES, null, this);
         }
     }
 
@@ -315,5 +318,20 @@ public class NoteActivity extends AppCompatActivity {
 
         saveOriginalStateValues();
         displayNote();
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        return null;
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+
     }
 }
