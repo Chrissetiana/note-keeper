@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity
         recyclerItems = findViewById(R.id.list_items);
 
         List<NoteInfo> notes = DataManager.getInstance().getNotes();
-        noteAdapter = new NoteRecyclerAdapter(this, notes);
+        noteAdapter = new NoteRecyclerAdapter(this, cursor);
         noteLayoutManager = new LinearLayoutManager(this);
 
         List<CourseInfo> courses = DataManager.getInstance().getCourses();
