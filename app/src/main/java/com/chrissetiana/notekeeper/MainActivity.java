@@ -2,6 +2,8 @@ package com.chrissetiana.notekeeper;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -21,6 +23,8 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.util.List;
+
+import static com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.NoteInfoEntry;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -69,8 +73,30 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onResume() {
         super.onResume();
-        noteAdapter.notifyDataSetChanged();
+        loadNotes();
         updateNaveHeader();
+    }
+
+    private void loadNotes() {
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+
+        final String[] columnsNotes = {
+                NoteInfoEntry.COLUMN_NOTE_TITLE,
+                NoteInfoEntry.COLUMN_COURSE_ID,
+                NoteInfoEntry._ID};
+
+        String orderBy = NoteInfoEntry.COLUMN_COURSE_ID + "," + NoteInfoEntry.COLUMN_NOTE_TITLE;
+
+        final Cursor cursorNotes = db.query(
+                NoteInfoEntry.TABLE_NAME,
+                columnsNotes,
+                null,
+                null,
+                null,
+                null,
+                orderBy);
+
+        noteAdapter.changeCursor(cursorNotes);
     }
 
     @Override
@@ -99,8 +125,7 @@ public class MainActivity extends AppCompatActivity
 
         recyclerItems = findViewById(R.id.list_items);
 
-        List<NoteInfo> notes = DataManager.getInstance().getNotes();
-        noteAdapter = new NoteRecyclerAdapter(this, cursor);
+        noteAdapter = new NoteRecyclerAdapter(this, null);
         noteLayoutManager = new LinearLayoutManager(this);
 
         List<CourseInfo> courses = DataManager.getInstance().getCourses();
