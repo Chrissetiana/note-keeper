@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -87,14 +88,7 @@ public class MainActivity extends AppCompatActivity
 
         String orderBy = NoteInfoEntry.COLUMN_COURSE_ID + "," + NoteInfoEntry.COLUMN_NOTE_TITLE;
 
-        final Cursor cursorNotes = db.query(
-                NoteInfoEntry.TABLE_NAME,
-                columnsNotes,
-                null,
-                null,
-                null,
-                null,
-                orderBy);
+        final Cursor cursorNotes = db.query(NoteInfoEntry.TABLE_NAME, columnsNotes, null, null, null, null, orderBy);
 
         noteAdapter.changeCursor(cursorNotes);
     }
@@ -125,12 +119,13 @@ public class MainActivity extends AppCompatActivity
 
         recyclerItems = findViewById(R.id.list_items);
 
-        noteAdapter = new NoteRecyclerAdapter(this, null);
         noteLayoutManager = new LinearLayoutManager(this);
+        courseLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.layout_manager));
+
+        noteAdapter = new NoteRecyclerAdapter(this, null);
 
         List<CourseInfo> courses = DataManager.getInstance().getCourses();
         courseAdapter = new CourseRecyclerAdapter(this, courses);
-        courseLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.layout_manager));
 
         displayNotes();
         displayCourses();
@@ -190,7 +185,7 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
         if (id == R.id.nav_notes) {

@@ -12,7 +12,7 @@ import java.util.List;
 public class DataManager {
     private static DataManager ourInstance = null;
 
-    private List<CourseInfo> courses = new ArrayList<>();
+    private final List<CourseInfo> courses = new ArrayList<>();
     private List<NoteInfo> notes = new ArrayList<>();
 
     private DataManager() {
@@ -28,36 +28,16 @@ public class DataManager {
         return ourInstance;
     }
 
-    public static void loadFromDatabase(NoteKeeperDatabaseHelper helper) {
+    static void loadFromDatabase(NoteKeeperDatabaseHelper helper) {
         SQLiteDatabase db = helper.getReadableDatabase();
 
-        final String[] columnsCourse = {
-                CourseInfoEntry.COLUMN_COURSE_ID,
-                CourseInfoEntry.COLUMN_COURSE_TITLE};
-        final Cursor cursorCourses = db.query(
-                CourseInfoEntry.TABLE_NAME,
-                columnsCourse,
-                null,
-                null,
-                null,
-                null,
-                CourseInfoEntry.COLUMN_COURSE_TITLE + " DESC");
+        final String[] columnsCourse = {CourseInfoEntry.COLUMN_COURSE_ID, CourseInfoEntry.COLUMN_COURSE_TITLE};
+        final Cursor cursorCourses = db.query(CourseInfoEntry.TABLE_NAME, columnsCourse, null, null, null, null, CourseInfoEntry.COLUMN_COURSE_TITLE + " DESC");
         loadCoursesFromDatabase(cursorCourses);
 
-        final String[] columnsNotes = {
-                NoteInfoEntry.COLUMN_NOTE_TITLE,
-                NoteInfoEntry.COLUMN_NOTE_TEXT,
-                NoteInfoEntry.COLUMN_COURSE_ID,
-                NoteInfoEntry._ID};
+        final String[] columnsNotes = {NoteInfoEntry.COLUMN_NOTE_TITLE, NoteInfoEntry.COLUMN_NOTE_TEXT, NoteInfoEntry.COLUMN_COURSE_ID, NoteInfoEntry._ID};
         String orderBy = NoteInfoEntry.COLUMN_COURSE_ID + "," + NoteInfoEntry.COLUMN_NOTE_TITLE;
-        final Cursor cursorNotes = db.query(
-                NoteInfoEntry.TABLE_NAME,
-                columnsNotes,
-                null,
-                null,
-                null,
-                null,
-                orderBy);
+        final Cursor cursorNotes = db.query(NoteInfoEntry.TABLE_NAME, columnsNotes, null, null, null, null, orderBy);
         loadNotesFromDatabase(cursorNotes);
     }
 
@@ -110,17 +90,17 @@ public class DataManager {
         return "chrissetiana@gmail.com";
     }
 
-    public List<NoteInfo> getNotes() {
+    List<NoteInfo> getNotes() {
         return notes;
     }
 
-    public int createNewNote() {
+    int createNewNote() {
         NoteInfo note = new NoteInfo(0, null, null, null);
         notes.add(note);
         return notes.size() - 1;
     }
 
-    public int findNote(NoteInfo note) {
+    int findNote(NoteInfo note) {
         for (int i = 0; i < notes.size(); i++) {
             if (note.equals(notes.get(i))) {
                 return i;
@@ -130,15 +110,15 @@ public class DataManager {
         return -1;
     }
 
-    public void removeNote(int index) {
+    void removeNote(int index) {
         notes.remove(index);
     }
 
-    public List<CourseInfo> getCourses() {
+    List<CourseInfo> getCourses() {
         return courses;
     }
 
-    public CourseInfo getCourse(String id) {
+    CourseInfo getCourse(String id) {
         for (CourseInfo course : courses) {
             if (id.equals(course.getCourseId())) {
                 return course;
@@ -150,10 +130,12 @@ public class DataManager {
 
     public List<NoteInfo> getNotes(CourseInfo course) {
         ArrayList<NoteInfo> notes = new ArrayList<>();
+
         for (NoteInfo note : notes) {
             if (course.equals(note.getCourse()))
                 notes.add(note);
         }
+
         return notes;
     }
 
@@ -276,7 +258,7 @@ public class DataManager {
         return new CourseInfo("java_core", "Java Fundamentals: The Core Platform", modules);
     }
 
-    public int createNewNote(CourseInfo course, String noteTitle, String noteText) {
+    int createNewNote(CourseInfo course, String noteTitle, String noteText) {
         int index = createNewNote();
 
         NoteInfo note = getNotes().get(index);

@@ -1,6 +1,7 @@
 package com.chrissetiana.notekeeper;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -16,20 +17,21 @@ public class CourseRecyclerAdapter extends RecyclerView.Adapter<CourseRecyclerAd
     private final List<CourseInfo> courses;
     private final LayoutInflater layoutInflater;
 
-    public CourseRecyclerAdapter(Context context, List<CourseInfo> courses) {
+    CourseRecyclerAdapter(Context context, List<CourseInfo> courses) {
         this.context = context;
         layoutInflater = LayoutInflater.from(context);
         this.courses = courses;
     }
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View itemView = layoutInflater.inflate(R.layout.item_course_list, viewGroup, false);
         return new ViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         CourseInfo course = courses.get(position);
         holder.textCourse.setText(course.getTitle());
         holder.currentPosition = position;
@@ -40,12 +42,12 @@ public class CourseRecyclerAdapter extends RecyclerView.Adapter<CourseRecyclerAd
         return courses.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
 
-        public final TextView textCourse;
-        public int currentPosition;
+        final TextView textCourse;
+        int currentPosition;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
 
             textCourse = itemView.findViewById(R.id.text_course);

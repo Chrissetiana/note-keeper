@@ -3,8 +3,8 @@ package com.chrissetiana.notekeeper;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
-public class DatabaseDataWorker {
-    private SQLiteDatabase database;
+class DatabaseDataWorker {
+    private final SQLiteDatabase database;
 
     public DatabaseDataWorker(SQLiteDatabase db) {
         database = db;

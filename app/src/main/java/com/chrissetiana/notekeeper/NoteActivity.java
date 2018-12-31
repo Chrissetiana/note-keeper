@@ -2,6 +2,7 @@ package com.chrissetiana.notekeeper;
 
 import android.annotation.SuppressLint;
 import android.app.LoaderManager;
+import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
@@ -11,7 +12,6 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
-import android.support.v4.content.CursorLoader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -22,6 +22,8 @@ import android.widget.Spinner;
 
 import static com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.CourseInfoEntry;
 import static com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.NoteInfoEntry;
+
+//import android.support.v4.content.CursorLoader;
 
 public class NoteActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String NOTE_ID = "com.chrissetiana.notekeeper.NOTE_ID";
@@ -48,6 +50,8 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
     private int cursorTitlePos;
     private int cursorTextPos;
     private SimpleCursorAdapter adapterCourses;
+    private boolean notesQueryFinished;
+    private boolean courseQueryFinished;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,22 +94,8 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
     private void loadCourseData() {
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
 
-        String[] courseColumns = {
-                CourseInfoEntry.COLUMN_COURSE_TITLE,
-                CourseInfoEntry.COLUMN_COURSE_ID,
-                CourseInfoEntry._ID
-        };
-
-        Cursor cursor = db.query(
-                CourseInfoEntry.TABLE_NAME,
-                courseColumns,
-                null,
-                null,
-                null,
-                null,
-                CourseInfoEntry.COLUMN_COURSE_TITLE
-        );
-
+        String[] courseColumns = {CourseInfoEntry.COLUMN_COURSE_TITLE, CourseInfoEntry.COLUMN_COURSE_ID, CourseInfoEntry._ID};
+        Cursor cursor = db.query(CourseInfoEntry.TABLE_NAME, courseColumns, null, null, null, null, CourseInfoEntry.COLUMN_COURSE_TITLE);
         adapterCourses.changeCursor(cursor);
     }
 
@@ -123,14 +113,9 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
 
         String selection = NoteInfoEntry._ID + " = ? AND " + NoteInfoEntry.COLUMN_NOTE_TITLE + " LIKE ? ";
         String[] selectionArgs = {Integer.toString(noteId)};
-        String[] columns = {
-                NoteInfoEntry.COLUMN_COURSE_ID,
-                NoteInfoEntry.COLUMN_NOTE_TITLE,
-                NoteInfoEntry.COLUMN_NOTE_TEXT};
+        String[] columns = {NoteInfoEntry.COLUMN_COURSE_ID, NoteInfoEntry.COLUMN_NOTE_TITLE, NoteInfoEntry.COLUMN_NOTE_TEXT};
 
-        noteCursor = db.query(NoteInfoEntry.TABLE_NAME,
-                columns, selection, selectionArgs,
-                null, null, null);
+        noteCursor = db.query(NoteInfoEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
 
         cursorIdPos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_COURSE_ID);
         cursorTitlePos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TITLE);
@@ -188,6 +173,7 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == SHOW_CAMERA && resultCode == RESULT_OK) {
+            assert data != null;
             Bitmap thumbnail = data.getParcelableExtra("data");
         }
     }
@@ -331,6 +317,8 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @SuppressLint("StaticFieldLeak")
     private CursorLoader createLoaderCourses() {
+        notesQueryFinished = false;
+
         return new CursorLoader(this) {
             @Override
             public Cursor loadInBackground() {
@@ -341,14 +329,9 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 String selection = NoteInfoEntry._ID + " = ? AND " + NoteInfoEntry.COLUMN_NOTE_TITLE + " LIKE ? ";
                 String[] selectionArgs = {Integer.toString(noteId)};
-                String[] columns = {
-                        NoteInfoEntry.COLUMN_COURSE_ID,
-                        NoteInfoEntry.COLUMN_NOTE_TITLE,
-                        NoteInfoEntry.COLUMN_NOTE_TEXT};
+                String[] columns = {NoteInfoEntry.COLUMN_COURSE_ID, NoteInfoEntry.COLUMN_NOTE_TITLE, NoteInfoEntry.COLUMN_NOTE_TEXT};
 
-                return db.query(NoteInfoEntry.TABLE_NAME,
-                        columns, selection, selectionArgs,
-                        null, null, null);
+                return db.query(NoteInfoEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
             }
         };
     }
@@ -365,14 +348,9 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 String selection = NoteInfoEntry._ID + " = ? AND " + NoteInfoEntry.COLUMN_NOTE_TITLE + " LIKE ? ";
                 String[] selectionArgs = {Integer.toString(noteId)};
-                String[] columns = {
-                        NoteInfoEntry.COLUMN_COURSE_ID,
-                        NoteInfoEntry.COLUMN_NOTE_TITLE,
-                        NoteInfoEntry.COLUMN_NOTE_TEXT};
+                String[] columns = {NoteInfoEntry.COLUMN_COURSE_ID, NoteInfoEntry.COLUMN_NOTE_TITLE, NoteInfoEntry.COLUMN_NOTE_TEXT};
 
-                return db.query(NoteInfoEntry.TABLE_NAME,
-                        columns, selection, selectionArgs,
-                        null, null, null);
+                return db.query(NoteInfoEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
             }
         };
     }
@@ -383,6 +361,7 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
             loadFinishedNotes(data);
         } else if (loader.getId() == LOADER_COURSES) {
             adapterCourses.changeCursor(data);
+            notesQueryFinished = true;
         }
     }
 
@@ -393,8 +372,15 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
         cursorTitlePos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TITLE);
         cursorTextPos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TEXT);
 
+        notesQueryFinished = true;
         noteCursor.moveToNext();
-        displayNote();
+        displayNotesWhenQueriesFinished();
+    }
+
+    private void displayNotesWhenQueriesFinished() {
+        if (notesQueryFinished && courseQueryFinished) {
+            displayNote();
+        }
     }
 
     @Override

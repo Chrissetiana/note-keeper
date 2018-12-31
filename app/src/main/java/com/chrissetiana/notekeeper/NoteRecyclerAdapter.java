@@ -3,6 +3,7 @@ package com.chrissetiana.notekeeper;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,7 +21,7 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
     private int courseTitle;
     private int idPos;
 
-    public NoteRecyclerAdapter(Context context, Cursor cursor) {
+    NoteRecyclerAdapter(Context context, Cursor cursor) {
         this.context = context;
         layoutInflater = LayoutInflater.from(context);
         this.cursor = cursor;
@@ -37,7 +38,7 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
         idPos = cursor.getColumnIndex(NoteInfoEntry._ID);
     }
 
-    public void changeCursor(Cursor c) {
+    void changeCursor(Cursor c) {
         if (cursor != null) {
             cursor.close();
         }
@@ -47,14 +48,15 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
         notifyDataSetChanged();
     }
 
+    @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
         View itemView = layoutInflater.inflate(R.layout.item_note_list, viewGroup, false);
         return new ViewHolder(itemView);
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         cursor.moveToPosition(position);
 
         String course = cursor.getString(coursePos);
@@ -71,13 +73,13 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
         return cursor == null ? 0 : cursor.getCount();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    class ViewHolder extends RecyclerView.ViewHolder {
 
-        public final TextView textCourse;
-        public final TextView textTitle;
-        public int id;
+        final TextView textCourse;
+        final TextView textTitle;
+        int id;
 
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
 
             textCourse = itemView.findViewById(R.id.text_course);

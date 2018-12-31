@@ -33,6 +33,7 @@
         android:inputType="textMultiLine"
         app:layout_constraintEnd_toEndOf="@+id/spinner_courses"
         app:layout_constraintStart_toStartOf="@+id/spinner_courses"
+        android:importantForAutofill="no"
         app:layout_constraintTop_toBottomOf="@+id/spinner_courses" />
 
     <EditText
@@ -47,6 +48,7 @@
         android:inputType="textMultiLine"
         app:layout_constraintEnd_toEndOf="@+id/text_title"
         app:layout_constraintStart_toStartOf="@+id/text_title"
+        android:importantForAutofill="no"
         app:layout_constraintTop_toBottomOf="@+id/text_title" />
 
 </android.support.constraint.ConstraintLayout>
