@@ -317,7 +317,7 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @SuppressLint("StaticFieldLeak")
     private CursorLoader createLoaderCourses() {
-        notesQueryFinished = false;
+        courseQueryFinished = false;
 
         return new CursorLoader(this) {
             @Override
@@ -338,6 +338,8 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @SuppressLint("StaticFieldLeak")
     private CursorLoader createLoaderNotes() {
+        notesQueryFinished = false;
+
         return new CursorLoader(this) {
             @Override
             public Cursor loadInBackground() {
@@ -361,7 +363,8 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
             loadFinishedNotes(data);
         } else if (loader.getId() == LOADER_COURSES) {
             adapterCourses.changeCursor(data);
-            notesQueryFinished = true;
+            courseQueryFinished = true;
+            displayNotesWhenQueriesFinished();
         }
     }
 
@@ -373,6 +376,7 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
         cursorTextPos = noteCursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TEXT);
 
         notesQueryFinished = true;
+
         noteCursor.moveToNext();
         displayNotesWhenQueriesFinished();
     }

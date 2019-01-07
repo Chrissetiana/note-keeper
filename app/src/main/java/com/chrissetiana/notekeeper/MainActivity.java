@@ -87,7 +87,6 @@ public class MainActivity extends AppCompatActivity
                 NoteInfoEntry._ID};
 
         String orderBy = NoteInfoEntry.COLUMN_COURSE_ID + "," + NoteInfoEntry.COLUMN_NOTE_TITLE;
-
         final Cursor cursorNotes = db.query(NoteInfoEntry.TABLE_NAME, columnsNotes, null, null, null, null, orderBy);
 
         noteAdapter.changeCursor(cursorNotes);
