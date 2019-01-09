@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onResume() {
         super.onResume();
 
-        getLoaderManager().initLoader(LOADER_NOTES, null, this);
+        getLoaderManager().restartLoader(LOADER_NOTES, null, this);
 
         updateNaveHeader();
     }
