@@ -233,11 +233,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 public Cursor loadInBackground() {
                     SQLiteDatabase db = databaseHelper.getReadableDatabase();
 
-                    final String[] noteColumns = {NoteInfoEntry._ID, NoteInfoEntry.COLUMN_NOTE_TITLE, NoteInfoEntry.COLUMN_COURSE_ID};
+                    final String[] noteColumns = {
+                            NoteInfoEntry.getQualifiedName(NoteInfoEntry._ID),
+                            NoteInfoEntry.COLUMN_NOTE_TITLE,
+                            NoteInfoEntry.getQualifiedName(NoteInfoEntry.COLUMN_COURSE_ID),
+                            CourseInfoEntry.COLUMN_COURSE_TITLE};
                     final String noteOrderBy = NoteInfoEntry.COLUMN_COURSE_ID + ", " + NoteInfoEntry.COLUMN_NOTE_TITLE;
                     String joinTables = NoteInfoEntry.TABLE_NAME + " JOIN " + CourseInfoEntry.TABLE_NAME + " ON " +
-                            NoteInfoEntry.TABLE_NAME + "." + NoteInfoEntry.COLUMN_COURSE_ID + "=" +
-                            CourseInfoEntry.TABLE_NAME + "." + CourseInfoEntry.COLUMN_COURSE_ID;
+                            NoteInfoEntry.getQualifiedName(NoteInfoEntry.COLUMN_COURSE_ID) + "=" +
+                            CourseInfoEntry.getQualifiedName(CourseInfoEntry.COLUMN_COURSE_ID);
 
                     return db.query(joinTables, noteColumns, null, null, null, null, noteOrderBy);
                 }
