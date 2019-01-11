@@ -27,6 +27,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.CourseInfoEntry;
+
 import java.util.List;
 
 import static com.chrissetiana.notekeeper.NoteActivity.LOADER_NOTES;
@@ -233,8 +235,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
                     final String[] noteColumns = {NoteInfoEntry._ID, NoteInfoEntry.COLUMN_NOTE_TITLE, NoteInfoEntry.COLUMN_COURSE_ID};
                     final String noteOrderBy = NoteInfoEntry.COLUMN_COURSE_ID + ", " + NoteInfoEntry.COLUMN_NOTE_TITLE;
+                    String joinTables = NoteInfoEntry.TABLE_NAME + " JOIN " + CourseInfoEntry.TABLE_NAME + " ON " +
+                            NoteInfoEntry.TABLE_NAME + "." + NoteInfoEntry.COLUMN_COURSE_ID + "=" +
+                            CourseInfoEntry.TABLE_NAME + "." + CourseInfoEntry.COLUMN_COURSE_ID;
 
-                    return db.query(NoteInfoEntry.TABLE_NAME, noteColumns, null, null, null, null, noteOrderBy);
+                    return db.query(joinTables, noteColumns, null, null, null, null, noteOrderBy);
                 }
             };
         }
