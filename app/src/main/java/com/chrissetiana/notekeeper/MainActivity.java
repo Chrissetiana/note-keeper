@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 NoteInfoEntry._ID};
 
         String orderBy = NoteInfoEntry.COLUMN_COURSE_ID + "," + NoteInfoEntry.COLUMN_NOTE_TITLE;
+
         final Cursor cursorNotes = db.query(NoteInfoEntry.TABLE_NAME, columnsNotes, null, null, null, null, orderBy);
 
         noteAdapter.changeCursor(cursorNotes);
@@ -213,7 +214,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     private void handleShare() {
         View view = findViewById(R.id.list_items);
-        final String userFavoriteSocial = PreferenceManager.getDefaultSharedPreferences(this).getString("user_favorite_social", "");
+
+        final String userFavoriteSocial = PreferenceManager
+                .getDefaultSharedPreferences(this)
+                .getString("user_favorite_social", "");
+
         Snackbar.make(view, "Share to " + userFavoriteSocial, Snackbar.LENGTH_LONG).show();
     }
 
@@ -236,9 +241,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     final String[] noteColumns = {
                             NoteInfoEntry.getQualifiedName(NoteInfoEntry._ID),
                             NoteInfoEntry.COLUMN_NOTE_TITLE,
-                            NoteInfoEntry.getQualifiedName(NoteInfoEntry.COLUMN_COURSE_ID),
                             CourseInfoEntry.COLUMN_COURSE_TITLE};
-                    final String noteOrderBy = NoteInfoEntry.COLUMN_COURSE_ID + ", " + NoteInfoEntry.COLUMN_NOTE_TITLE;
+
+                    final String noteOrderBy = CourseInfoEntry.COLUMN_COURSE_TITLE + ", " + NoteInfoEntry.COLUMN_NOTE_TITLE;
+
                     String joinTables = NoteInfoEntry.TABLE_NAME + " JOIN " + CourseInfoEntry.TABLE_NAME + " ON " +
                             NoteInfoEntry.getQualifiedName(NoteInfoEntry.COLUMN_COURSE_ID) + "=" +
                             CourseInfoEntry.getQualifiedName(CourseInfoEntry.COLUMN_COURSE_ID);

@@ -94,8 +94,13 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
     private void loadCourseData() {
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
 
-        String[] courseColumns = {CourseInfoEntry.COLUMN_COURSE_TITLE, CourseInfoEntry.COLUMN_COURSE_ID, CourseInfoEntry._ID};
+        String[] courseColumns = {
+                CourseInfoEntry.COLUMN_COURSE_TITLE,
+                CourseInfoEntry.COLUMN_COURSE_ID,
+                CourseInfoEntry._ID};
+
         Cursor cursor = db.query(CourseInfoEntry.TABLE_NAME, courseColumns, null, null, null, null, CourseInfoEntry.COLUMN_COURSE_TITLE);
+
         adapterCourses.changeCursor(cursor);
     }
 
@@ -329,7 +334,10 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 String selection = NoteInfoEntry._ID + " = ? AND " + NoteInfoEntry.COLUMN_NOTE_TITLE + " LIKE ? ";
                 String[] selectionArgs = {Integer.toString(noteId)};
-                String[] columns = {NoteInfoEntry.COLUMN_COURSE_ID, NoteInfoEntry.COLUMN_NOTE_TITLE, NoteInfoEntry.COLUMN_NOTE_TEXT};
+                String[] columns = {
+                        NoteInfoEntry.COLUMN_COURSE_ID,
+                        NoteInfoEntry.COLUMN_NOTE_TITLE,
+                        NoteInfoEntry.COLUMN_NOTE_TEXT};
 
                 return db.query(NoteInfoEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
             }

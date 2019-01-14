@@ -10,6 +10,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.CourseInfoEntry;
+
 import static com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.NoteInfoEntry;
 
 public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapter.ViewHolder> {
@@ -33,7 +35,7 @@ public class NoteRecyclerAdapter extends RecyclerView.Adapter<NoteRecyclerAdapte
             return;
         }
 
-        coursePos = cursor.getColumnIndex(NoteInfoEntry.COLUMN_COURSE_ID);
+        coursePos = cursor.getColumnIndex(CourseInfoEntry.COLUMN_COURSE_TITLE);
         courseTitle = cursor.getColumnIndex(NoteInfoEntry.COLUMN_NOTE_TITLE);
         idPos = cursor.getColumnIndex(NoteInfoEntry._ID);
     }
