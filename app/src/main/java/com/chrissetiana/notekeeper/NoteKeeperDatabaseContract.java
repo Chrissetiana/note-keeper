@@ -18,6 +18,10 @@ final class NoteKeeperDatabaseContract {
                 COLUMN_COURSE_ID + " TEXT UNIQUE NOT NULL, " +
                 COLUMN_COURSE_TITLE + " TEXT NOT NULL)";
 
+        static final String INDEX1 = TABLE_NAME + "_index1";
+        static final String SQL_CREATE_INDEX1 = "CREATE INDEX " + INDEX1 +
+                " ON " + TABLE_NAME + "(" + COLUMN_COURSE_TITLE + ")";
+
         static final String getQualifiedName(String columnName) {
             return TABLE_NAME + "." + columnName;
         }
@@ -34,6 +38,10 @@ final class NoteKeeperDatabaseContract {
                 COLUMN_NOTE_TITLE + " TEXT NOT NULL, " +
                 COLUMN_NOTE_TEXT + " TEXT, " +
                 COLUMN_COURSE_ID + " TEXT NOT NULL)";
+
+        static final String INDEX1 = TABLE_NAME + "_index1";
+        static final String SQL_CREATE_INDEX1 = "CREATE INDEX " + INDEX1 +
+                " ON " + TABLE_NAME + "(" + COLUMN_NOTE_TITLE + ")";
 
         static final String getQualifiedName(String columnName) {
             return TABLE_NAME + "." + columnName;
