@@ -15,6 +15,7 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -35,9 +36,10 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
     public static final int SHOW_CAMERA = 1;
     public static final int LOADER_NOTES = 0;
     public static final int LOADER_COURSES = 1;
+    public static final String TAG = "Note Activity";
     private NoteInfo note;
     private boolean isNewNote;
-    private Spinner spinnerText;
+    private Spinner spinnerCourses;
     private EditText textTitle;
     private EditText textNote;
     private int noteId;
@@ -64,7 +66,7 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
 
         databaseHelper = new NoteKeeperDatabaseHelper(this);
 
-        spinnerText = findViewById(R.id.spinner_courses);
+        spinnerCourses = findViewById(R.id.spinner_courses);
 
         final String[] str = {CourseInfoEntry.COLUMN_COURSE_TITLE};
         final int[] text = {android.R.id.text1};
@@ -72,7 +74,7 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
 
         adapterCourses = new SimpleCursorAdapter(this, layout, null, str, text, 0);
         adapterCourses.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerText.setAdapter(adapterCourses);
+        spinnerCourses.setAdapter(adapterCourses);
 
         getLoaderManager().initLoader(LOADER_COURSES, null, this);
 
@@ -190,6 +192,7 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
 
         if (isCancelling) {
             if (isNewNote) {
+                Log.i(TAG, "Cancelling note at position: " + noteId);
                 DataManager.getInstance().removeNote(noteId);
             } else {
                 storePreviousStateValues();
@@ -197,6 +200,8 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
         } else {
             saveNote();
         }
+
+        Log.d(TAG, "onPause");
     }
 
     private void readDisplayStateValues() {
@@ -240,7 +245,7 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
         String courseText = noteCursor.getString(cursorTextPos);
 
         int courseIndex = getCourseIdIndex(courseId);
-        spinnerText.setSelection(courseIndex);
+        spinnerCourses.setSelection(courseIndex);
 
         textTitle.setText(courseTitle);
         textNote.setText(courseText);
@@ -272,9 +277,22 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     private void saveNote() {
-        note.setCourse((CourseInfo) spinnerText.getSelectedItem());
-        note.setTitle(textTitle.getText().toString());
-        note.setText(textNote.getText().toString());
+        String courseId = selectedCourseId();
+        String noteTitle = textTitle.getText().toString();
+        String noteText = textNote.getText().toString();
+
+        saveNoteToDatabase(courseId, noteTitle, noteText);
+    }
+
+    private String selectedCourseId() {
+        int selectedPosition = spinnerCourses.getSelectedItemPosition();
+
+        Cursor cursor = adapterCourses.getCursor();
+        cursor.moveToPosition(selectedPosition);
+
+        int courseIdPos = cursor.getColumnIndex(CourseInfoEntry.COLUMN_COURSE_ID);
+
+        return cursor.getString(courseIdPos);
     }
 
     private void saveNoteToDatabase(String courseId, String noteTitle, String noteText) {
@@ -291,7 +309,7 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     private void sendEmail() {
-        CourseInfo course = (CourseInfo) spinnerText.getSelectedItem();
+        CourseInfo course = (CourseInfo) spinnerCourses.getSelectedItem();
 
         String subject = textTitle.getText().toString();
         String note = textNote.getText().toString();
