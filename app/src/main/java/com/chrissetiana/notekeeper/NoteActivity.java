@@ -2,6 +2,7 @@ package com.chrissetiana.notekeeper;
 
 import android.annotation.SuppressLint;
 import android.app.LoaderManager;
+import android.content.ContentValues;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
@@ -201,7 +202,6 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
     private void readDisplayStateValues() {
         Intent intent = getIntent();
         noteId = intent.getIntExtra(NOTE_ID, ID_NOT_SET);
-
         isNewNote = noteId == ID_NOT_SET;
 
         if (isNewNote) {
@@ -277,6 +277,19 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
         note.setText(textNote.getText().toString());
     }
 
+    private void saveNoteToDatabase(String courseId, String noteTitle, String noteText) {
+        String selection = NoteInfoEntry._ID + " = ? ";
+        String[] selectionArgs = {Integer.toString(noteId)};
+
+        ContentValues values = new ContentValues();
+        values.put(NoteInfoEntry.COLUMN_COURSE_ID, courseId);
+        values.put(NoteInfoEntry.COLUMN_NOTE_TITLE, noteTitle);
+        values.put(NoteInfoEntry.COLUMN_NOTE_TEXT, noteText);
+
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        db.update(NoteInfoEntry.TABLE_NAME, values, selection, selectionArgs);
+    }
+
     private void sendEmail() {
         CourseInfo course = (CourseInfo) spinnerText.getSelectedItem();
 
@@ -332,7 +345,7 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
                 String courseId = "android_intents";
                 String titleStart = "dynamic";
 
-                String selection = NoteInfoEntry._ID + " = ? AND " + NoteInfoEntry.COLUMN_NOTE_TITLE + " LIKE ? ";
+                String selection = NoteInfoEntry._ID + " = ? ";
                 String[] selectionArgs = {Integer.toString(noteId)};
                 String[] columns = {
                         NoteInfoEntry.COLUMN_COURSE_ID,
@@ -356,9 +369,12 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
                 String courseId = "android_intents";
                 String titleStart = "dynamic";
 
-                String selection = NoteInfoEntry._ID + " = ? AND " + NoteInfoEntry.COLUMN_NOTE_TITLE + " LIKE ? ";
+                String selection = NoteInfoEntry._ID + " = ? ";
                 String[] selectionArgs = {Integer.toString(noteId)};
-                String[] columns = {NoteInfoEntry.COLUMN_COURSE_ID, NoteInfoEntry.COLUMN_NOTE_TITLE, NoteInfoEntry.COLUMN_NOTE_TEXT};
+                String[] columns = {
+                        NoteInfoEntry.COLUMN_COURSE_ID,
+                        NoteInfoEntry.COLUMN_NOTE_TITLE,
+                        NoteInfoEntry.COLUMN_NOTE_TEXT};
 
                 return db.query(NoteInfoEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
             }
