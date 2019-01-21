@@ -15,7 +15,6 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
@@ -192,16 +191,21 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
 
         if (isCancelling) {
             if (isNewNote) {
-                Log.i(TAG, "Cancelling note at position: " + noteId);
-                DataManager.getInstance().removeNote(noteId);
+                deleteNoteFromDatabase();
             } else {
                 storePreviousStateValues();
             }
         } else {
             saveNote();
         }
+    }
 
-        Log.d(TAG, "onPause");
+    private void deleteNoteFromDatabase() {
+        String selection = NoteInfoEntry._ID + " = ? ";
+        String[] selectionArgs = {Integer.toString(noteId)};
+
+        SQLiteDatabase db = databaseHelper.getWritableDatabase();
+        db.delete(NoteInfoEntry.TABLE_NAME, selection, selectionArgs);
     }
 
     private void readDisplayStateValues() {
