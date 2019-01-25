@@ -1,6 +1,5 @@
 package com.chrissetiana.notekeeper;
 
-import android.annotation.SuppressLint;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Intent;
@@ -42,6 +41,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private CourseRecyclerAdapter courseAdapter;
     private GridLayoutManager courseLayoutManager;
     private NoteKeeperDatabaseHelper databaseHelper;
+
+    @Override
+    protected void onDestroy() {
+        databaseHelper.close();
+        super.onDestroy();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,12 +106,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         noteAdapter.changeCursor(cursorNotes);
     }
 
-    @Override
-    protected void onDestroy() {
-        databaseHelper.close();
-        super.onDestroy();
-    }
-
     private void updateNaveHeader() {
         NavigationView navigationView = findViewById(R.id.nav_view);
         View headerView = navigationView.getHeaderView(0);
@@ -145,16 +144,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         selectNavigationMenuItem(R.id.nav_notes);
     }
 
-    private void displayCourses() {
-        recyclerItems.setLayoutManager(courseLayoutManager);
-        recyclerItems.setAdapter(courseAdapter);
-        selectNavigationMenuItem(R.id.nav_courses);
-    }
-
     private void selectNavigationMenuItem(int id) {
         NavigationView navigationView = findViewById(R.id.nav_view);
         Menu menu = navigationView.getMenu();
         menu.findItem(id).setChecked(true);
+    }
+
+    private void displayCourses() {
+        recyclerItems.setLayoutManager(courseLayoutManager);
+        recyclerItems.setAdapter(courseAdapter);
+        selectNavigationMenuItem(R.id.nav_courses);
     }
 
     @Override
@@ -177,12 +176,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             startActivity(new Intent(this, SettingsActivity.class));
             return true;
@@ -203,7 +198,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_share) {
             handleShare();
         } else if (id == R.id.nav_send) {
-            handleNotes(R.string.nav_send);
+            handleSelection(R.string.nav_send);
         }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -222,12 +217,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         Snackbar.make(view, "Share to " + userFavoriteSocial, Snackbar.LENGTH_LONG).show();
     }
 
-    private void handleNotes(int messageId) {
+    private void handleSelection(int messageId) {
         View view = findViewById(R.id.list_items);
         Snackbar.make(view, messageId, Snackbar.LENGTH_LONG).show();
     }
 
-    @SuppressLint("StaticFieldLeak")
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         CursorLoader loader = null;

@@ -1,6 +1,5 @@
 package com.chrissetiana.notekeeper;
 
-import android.annotation.SuppressLint;
 import android.app.LoaderManager;
 import android.content.ContentValues;
 import android.content.CursorLoader;
@@ -8,12 +7,8 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.provider.MediaStore;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -25,18 +20,15 @@ import android.widget.Spinner;
 import static com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.CourseInfoEntry;
 import static com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.NoteInfoEntry;
 
-//import android.support.v4.content.CursorLoader;
-
 public class NoteActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor> {
     public static final String NOTE_ID = "com.chrissetiana.notekeeper.NOTE_ID";
     public static final String ORIGINAL_NOTE_ID = "com.chrissetiana.notekeeper.NOTE_ID";
     public static final String ORIGINAL_NOTE_TITLE = "com.chrissetiana.notekeeper.NOTE_TITLE";
     public static final String ORIGINAL_NOTE_TEXT = "com.chrissetiana.notekeeper.NOTE_TEXT";
     public static final int ID_NOT_SET = -1;
-    public static final int SHOW_CAMERA = 1;
+    //    public static final int SHOW_CAMERA = 1;
     public static final int LOADER_NOTES = 0;
     public static final int LOADER_COURSES = 1;
-    public static final String TAG = "Note Activity";
     private NoteInfo note;
     private boolean isNewNote;
     private Spinner spinnerCourses;
@@ -55,6 +47,12 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
     private SimpleCursorAdapter adapterCourses;
     private boolean notesQueryFinished;
     private boolean courseQueryFinished;
+
+    @Override
+    protected void onDestroy() {
+        databaseHelper.close();
+        super.onDestroy();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,12 +105,6 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
         adapterCourses.changeCursor(cursor);
     }
 
-    @Override
-    protected void onDestroy() {
-        databaseHelper.close();
-        super.onDestroy();
-    }
-
     private void loadNoteData() {
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
 
@@ -133,57 +125,20 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
         displayNote();
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-
-        outState.putString(ORIGINAL_NOTE_ID, originalNoteId);
-        outState.putString(ORIGINAL_NOTE_TITLE, originalNoteTitle);
-        outState.putString(ORIGINAL_NOTE_TEXT, originalNoteText);
+    private void restoreOriginalStateValues(Bundle savedInstanceState) {
+        originalNoteId = savedInstanceState.getString(ORIGINAL_NOTE_ID);
+        originalNoteTitle = savedInstanceState.getString(ORIGINAL_NOTE_TITLE);
+        originalNoteText = savedInstanceState.getString(ORIGINAL_NOTE_TEXT);
     }
 
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem menuItem = menu.findItem(R.id.action_next);
-        int lastNoteIndex = DataManager.getInstance().getNotes().size() - 1;
-
-        menuItem.setEnabled(noteId < lastNoteIndex);
-
-        return super.onPrepareOptionsMenu(menu);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_note, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_send_mail) {
-            sendEmail();
-            return true;
-        } else if (id == R.id.action_add_image) {
-//            addImage();
-            return true;
-        } else if (id == R.id.action_next) {
-            moveNext();
-        } else if (id == R.id.action_cancel) {
-            isCancelling = true;
-            finish();
+    private void saveOriginalStateValues() {
+        if (isNewNote) {
+            return;
         }
 
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == SHOW_CAMERA && resultCode == RESULT_OK) {
-            assert data != null;
-            Bitmap thumbnail = data.getParcelableExtra("data");
-        }
+        originalNoteId = note.getCourse().getCourseId();
+        originalNoteTitle = note.getTitle();
+        originalNoteText = note.getText();
     }
 
     @Override
@@ -218,28 +173,6 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
         task.execute();
     }
 
-    private void readDisplayStateValues() {
-        Intent intent = getIntent();
-        noteId = intent.getIntExtra(NOTE_ID, ID_NOT_SET);
-        isNewNote = noteId == ID_NOT_SET;
-
-        if (isNewNote) {
-            createNote();
-        }
-
-//        note = DataManager.getInstance().getNotes().get(noteId);
-    }
-
-    private void saveOriginalStateValues() {
-        if (isNewNote) {
-            return;
-        }
-
-        originalNoteId = note.getCourse().getCourseId();
-        originalNoteTitle = note.getTitle();
-        originalNoteText = note.getText();
-    }
-
     private void storePreviousStateValues() {
         CourseInfo course = DataManager.getInstance().getCourse(originalNoteId);
         note.setCourse(course);
@@ -247,61 +180,13 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
         note.setText(originalNoteText);
     }
 
-    private void restoreOriginalStateValues(Bundle savedInstanceState) {
-        originalNoteId = savedInstanceState.getString(ORIGINAL_NOTE_ID);
-        originalNoteTitle = savedInstanceState.getString(ORIGINAL_NOTE_TITLE);
-        originalNoteText = savedInstanceState.getString(ORIGINAL_NOTE_TEXT);
-    }
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
-    private void displayNote() {
-        String courseId = noteCursor.getString(cursorIdPos);
-        String courseTitle = noteCursor.getString(cursorTitlePos);
-        String courseText = noteCursor.getString(cursorTextPos);
-
-        int courseIndex = getCourseIdIndex(courseId);
-        spinnerCourses.setSelection(courseIndex);
-
-        textTitle.setText(courseTitle);
-        textNote.setText(courseText);
-    }
-
-    private int getCourseIdIndex(String courseId) {
-        Cursor cursor = adapterCourses.getCursor();
-        int courseIdPos = cursor.getColumnIndex(CourseInfoEntry.COLUMN_COURSE_ID);
-        int courseRowIndex = 0;
-        boolean more = cursor.moveToFirst();
-
-        while (more) {
-            String cursorId = cursor.getString(courseIdPos);
-
-            if (courseId.equals(cursorId)) {
-                break;
-            }
-
-            courseRowIndex++;
-            more = cursor.moveToNext();
-        }
-
-        return courseRowIndex;
-    }
-
-    private void createNote() {
-        final ContentValues values = new ContentValues();
-        values.put(NoteInfoEntry.COLUMN_COURSE_ID, "");
-        values.put(NoteInfoEntry.COLUMN_NOTE_TITLE, "");
-        values.put(NoteInfoEntry.COLUMN_NOTE_TEXT, "");
-
-        AsyncTask task = new AsyncTask() {
-            @Override
-            protected Object doInBackground(Object[] objects) {
-                SQLiteDatabase db = databaseHelper.getWritableDatabase();
-                noteId = (int) db.insert(NoteInfoEntry.TABLE_NAME, null, values);
-
-                return null;
-            }
-        };
-
-        task.execute();
+        outState.putString(ORIGINAL_NOTE_ID, originalNoteId);
+        outState.putString(ORIGINAL_NOTE_TITLE, originalNoteTitle);
+        outState.putString(ORIGINAL_NOTE_TEXT, originalNoteText);
     }
 
     private void saveNote() {
@@ -345,6 +230,115 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
         task.execute();
     }
 
+    private void displayNote() {
+        String courseId = noteCursor.getString(cursorIdPos);
+        String courseTitle = noteCursor.getString(cursorTitlePos);
+        String courseText = noteCursor.getString(cursorTextPos);
+
+        int courseIndex = getCourseIdIndex(courseId);
+        spinnerCourses.setSelection(courseIndex);
+
+        textTitle.setText(courseTitle);
+        textNote.setText(courseText);
+    }
+
+    private int getCourseIdIndex(String courseId) {
+        Cursor cursor = adapterCourses.getCursor();
+        int courseIdPos = cursor.getColumnIndex(CourseInfoEntry.COLUMN_COURSE_ID);
+        int courseRowIndex = 0;
+        boolean more = cursor.moveToFirst();
+
+        while (more) {
+            String cursorId = cursor.getString(courseIdPos);
+
+            if (courseId.equals(cursorId)) {
+                break;
+            }
+
+            courseRowIndex++;
+            more = cursor.moveToNext();
+        }
+
+        return courseRowIndex;
+    }
+
+    private void readDisplayStateValues() {
+        Intent intent = getIntent();
+        noteId = intent.getIntExtra(NOTE_ID, ID_NOT_SET);
+        isNewNote = noteId == ID_NOT_SET;
+
+        if (isNewNote) {
+            createNote();
+        }
+
+//        note = DataManager.getInstance().getNotes().get(noteId);
+    }
+
+    private void createNote() {
+        final ContentValues values = new ContentValues();
+        values.put(NoteInfoEntry.COLUMN_COURSE_ID, "");
+        values.put(NoteInfoEntry.COLUMN_NOTE_TITLE, "");
+        values.put(NoteInfoEntry.COLUMN_NOTE_TEXT, "");
+
+        AsyncTask task = new AsyncTask() {
+            @Override
+            protected Object doInBackground(Object[] objects) {
+                SQLiteDatabase db = databaseHelper.getWritableDatabase();
+                noteId = (int) db.insert(NoteInfoEntry.TABLE_NAME, null, values);
+
+                return null;
+            }
+        };
+
+        task.execute();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_note, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_send_mail) {
+            sendEmail();
+            return true;
+        } else if (id == R.id.action_add_image) {
+//            addImage();
+            return true;
+        } else if (id == R.id.action_next) {
+            moveNext();
+        } else if (id == R.id.action_cancel) {
+            isCancelling = true;
+            finish();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem menuItem = menu.findItem(R.id.action_next);
+        int lastNoteIndex = DataManager.getInstance().getNotes().size() - 1;
+
+        menuItem.setEnabled(noteId < lastNoteIndex);
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    private void moveNext() {
+        saveNote();
+
+        ++noteId;
+        note = DataManager.getInstance().getNotes().get(noteId);
+
+        saveOriginalStateValues();
+        displayNote();
+    }
+
     private void sendEmail() {
         CourseInfo course = (CourseInfo) spinnerCourses.getSelectedItem();
 
@@ -357,22 +351,6 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
         intent.putExtra(Intent.EXTRA_SUBJECT, subject);
         intent.putExtra(Intent.EXTRA_TEXT, message);
         startActivity(intent);
-    }
-
-    private void addImage(Uri photoFile) {
-        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoFile);
-        startActivityForResult(intent, SHOW_CAMERA);
-    }
-
-    private void moveNext() {
-        saveNote();
-
-        ++noteId;
-        note = DataManager.getInstance().getNotes().get(noteId);
-
-        saveOriginalStateValues();
-        displayNote();
     }
 
     @Override
@@ -388,7 +366,6 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
         return loader;
     }
 
-    @SuppressLint("StaticFieldLeak")
     private CursorLoader createLoaderCourses() {
         courseQueryFinished = false;
 
@@ -412,7 +389,6 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
         };
     }
 
-    @SuppressLint("StaticFieldLeak")
     private CursorLoader createLoaderNotes() {
         notesQueryFinished = false;
 
@@ -476,4 +452,18 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
             adapterCourses.changeCursor(null);
         }
     }
+
+    /*@Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == SHOW_CAMERA && resultCode == RESULT_OK) {
+            assert data != null;
+            Bitmap thumbnail = data.getParcelableExtra("data");
+        }
+    }*/
+
+    /*private void addImage(Uri photoFile) {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, photoFile);
+        startActivityForResult(intent, SHOW_CAMERA);
+    }*/
 }
