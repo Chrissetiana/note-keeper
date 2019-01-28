@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -368,25 +369,13 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private CursorLoader createLoaderCourses() {
         courseQueryFinished = false;
+        Uri uri = Uri.parse("content://com.chrissetiana.notekeeper.provider");
+        String[] columns = {
+                CourseInfoEntry.COLUMN_COURSE_TITLE,
+                CourseInfoEntry.COLUMN_COURSE_ID,
+                CourseInfoEntry._ID};
 
-        return new CursorLoader(this) {
-            @Override
-            public Cursor loadInBackground() {
-                SQLiteDatabase db = databaseHelper.getReadableDatabase();
-
-                String courseId = "android_intents";
-                String titleStart = "dynamic";
-
-                String selection = NoteInfoEntry._ID + " = ? ";
-                String[] selectionArgs = {Integer.toString(noteId)};
-                String[] columns = {
-                        NoteInfoEntry.COLUMN_COURSE_ID,
-                        NoteInfoEntry.COLUMN_NOTE_TITLE,
-                        NoteInfoEntry.COLUMN_NOTE_TEXT};
-
-                return db.query(NoteInfoEntry.TABLE_NAME, columns, selection, selectionArgs, null, null, null);
-            }
-        };
+        return new CursorLoader(this, uri, columns, null, null, CourseInfoEntry.COLUMN_COURSE_TITLE);
     }
 
     private CursorLoader createLoaderNotes() {
