@@ -43,7 +43,7 @@ final class NoteKeeperDatabaseContract {
         static final String SQL_CREATE_INDEX1 = "CREATE INDEX " + INDEX1 +
                 " ON " + TABLE_NAME + "(" + COLUMN_NOTE_TITLE + ")";
 
-        static final String getQualifiedName(String columnName) {
+        static final String getQName(String columnName) {
             return TABLE_NAME + "." + columnName;
         }
     }

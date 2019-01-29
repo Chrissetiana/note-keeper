@@ -26,7 +26,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
-import com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.CourseInfoEntry;
+import com.chrissetiana.notekeeper.NoteKeeperProviderContract.Notes;
 
 import java.util.List;
 
@@ -227,25 +227,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         CursorLoader loader = null;
 
         if (id == LOADER_NOTES) {
-            loader = new CursorLoader(this) {
-                @Override
-                public Cursor loadInBackground() {
-                    SQLiteDatabase db = databaseHelper.getReadableDatabase();
+            final String[] noteColumns = {
+                    Notes._ID,
+                    Notes.COLUMN_NOTE_TITLE,
+                    Notes.COLUMN_COURSE_TITLE};
+            final String noteOrderBy = Notes.COLUMN_COURSE_TITLE + ", " + Notes.COLUMN_NOTE_TITLE;
 
-                    final String[] noteColumns = {
-                            NoteInfoEntry.getQualifiedName(NoteInfoEntry._ID),
-                            NoteInfoEntry.COLUMN_NOTE_TITLE,
-                            CourseInfoEntry.COLUMN_COURSE_TITLE};
-
-                    final String noteOrderBy = CourseInfoEntry.COLUMN_COURSE_TITLE + ", " + NoteInfoEntry.COLUMN_NOTE_TITLE;
-
-                    String joinTables = NoteInfoEntry.TABLE_NAME + " JOIN " + CourseInfoEntry.TABLE_NAME + " ON " +
-                            NoteInfoEntry.getQualifiedName(NoteInfoEntry.COLUMN_COURSE_ID) + "=" +
-                            CourseInfoEntry.getQualifiedName(CourseInfoEntry.COLUMN_COURSE_ID);
-
-                    return db.query(joinTables, noteColumns, null, null, null, null, noteOrderBy);
-                }
-            };
+            loader = new CursorLoader(this, Notes.CONTENT_EXPANDED_URI, noteColumns, null, null, noteOrderBy);
         }
 
         return loader;

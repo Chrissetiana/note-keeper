@@ -18,6 +18,8 @@ import android.widget.EditText;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
+import com.chrissetiana.notekeeper.NoteKeeperProviderContract.Courses;
+
 import static com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.CourseInfoEntry;
 import static com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.NoteInfoEntry;
 
@@ -369,13 +371,13 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private CursorLoader createLoaderCourses() {
         courseQueryFinished = false;
-        Uri uri = Uri.parse("content://com.chrissetiana.notekeeper.provider");
+        Uri uri = Courses.CONTENT_URI;
         String[] columns = {
-                CourseInfoEntry.COLUMN_COURSE_TITLE,
-                CourseInfoEntry.COLUMN_COURSE_ID,
-                CourseInfoEntry._ID};
+                Courses.COLUMN_COURSE_TITLE,
+                Courses.COLUMN_COURSE_ID,
+                Courses._ID};
 
-        return new CursorLoader(this, uri, columns, null, null, CourseInfoEntry.COLUMN_COURSE_TITLE);
+        return new CursorLoader(this, uri, columns, null, null, Courses.COLUMN_COURSE_TITLE);
     }
 
     private CursorLoader createLoaderNotes() {
