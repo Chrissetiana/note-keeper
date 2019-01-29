@@ -1,6 +1,7 @@
 package com.chrissetiana.notekeeper;
 
 import android.content.ContentProvider;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
@@ -16,17 +17,20 @@ import com.chrissetiana.notekeeper.NoteKeeperProviderContract.Notes;
 
 public class NoteKeeperDatabaseProvider extends ContentProvider {
 
-    private NoteKeeperDatabaseHelper databaseHelper;
     public static final int COURSES = 0;
     public static final int NOTES = 1;
     private static final int NOTES_EXPANDED = 2;
+    private static final int NOTES_ROW = 3;
     private static UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
     static {
         uriMatcher.addURI(NoteKeeperProviderContract.AUTHORITY, Courses.PATH, COURSES);
         uriMatcher.addURI(NoteKeeperProviderContract.AUTHORITY, Notes.PATH, NOTES);
         uriMatcher.addURI(NoteKeeperProviderContract.AUTHORITY, Notes.PATH_EXPANDED, NOTES_EXPANDED);
+        uriMatcher.addURI(NoteKeeperProviderContract.AUTHORITY, Notes.PATH + "/#", NOTES_ROW);
     }
+
+    private NoteKeeperDatabaseHelper databaseHelper;
 
     public NoteKeeperDatabaseProvider() {
 
@@ -47,8 +51,26 @@ public class NoteKeeperDatabaseProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        // TODO: Implement this to handle requests to insert a new row.
-        throw new UnsupportedOperationException("Not yet implemented");
+        SQLiteDatabase db = databaseHelper.getReadableDatabase();
+
+        Uri rowUri = null;
+        long rowId = -1;
+        int uriMatch = uriMatcher.match(uri);
+
+        switch (uriMatch) {
+            case NOTES:
+                rowId = db.insert(NoteInfoEntry.TABLE_NAME, null, values);
+                ContentUris.withAppendedId(Notes.CONTENT_URI, rowId);
+                break;
+            case COURSES:
+                rowId = db.insert(CourseInfoEntry.TABLE_NAME, null, values);
+                ContentUris.withAppendedId(Courses.CONTENT_URI, rowId);
+                break;
+            case NOTES_EXPANDED:
+                break;
+        }
+
+        return rowUri;
     }
 
     @Override
@@ -73,6 +95,12 @@ public class NoteKeeperDatabaseProvider extends ContentProvider {
                 break;
             case NOTES_EXPANDED:
                 cursor = notesExpandedQuery(db, projection, selection, selectionArgs, sortOrder);
+                break;
+            case NOTES_ROW:
+                long rowId = ContentUris.parseId(uri);
+                String rowSelection = NoteInfoEntry._ID + "=?";
+                String[] rowSelectionArgs = new String[]{Long.toString(rowId)};
+                cursor = db.query(NoteInfoEntry.TABLE_NAME, projection, rowSelection, rowSelectionArgs, null, null, null);
                 break;
         }
 
