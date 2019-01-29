@@ -1,6 +1,7 @@
 package com.chrissetiana.notekeeper;
 
 import android.content.ContentProvider;
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.UriMatcher;
@@ -19,6 +20,7 @@ public class NoteKeeperDatabaseProvider extends ContentProvider {
 
     public static final int COURSES = 0;
     public static final int NOTES = 1;
+    public static final String MIME_VENDOR_TYPE = "vnd." + NoteKeeperProviderContract.AUTHORITY + ".";
     private static final int NOTES_EXPANDED = 2;
     private static final int NOTES_ROW = 3;
     private static UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -44,9 +46,24 @@ public class NoteKeeperDatabaseProvider extends ContentProvider {
 
     @Override
     public String getType(Uri uri) {
-        // TODO: Implement this to handle requests for the MIME type of the data
-        // at the given URI.
-        throw new UnsupportedOperationException("Not yet implemented");
+        String mimeType = null;
+        int uriMatch = uriMatcher.match(uri);
+
+        switch (uriMatch) {
+            case COURSES:
+                mimeType = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + MIME_VENDOR_TYPE + Courses.PATH;
+                break;
+            case NOTES:
+                mimeType = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + MIME_VENDOR_TYPE + Notes.PATH;
+                break;
+            case NOTES_EXPANDED:
+                mimeType = ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + MIME_VENDOR_TYPE + Notes.PATH_EXPANDED;
+                break;
+            case NOTES_ROW:
+                mimeType = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + MIME_VENDOR_TYPE + Notes.PATH;
+
+
+        }
     }
 
     @Override
