@@ -318,7 +318,10 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     private void showReminderNotification() {
-        NoteReminderNotification.notify(this, "This is a sample notification", 0);
+        String noteTitle = textTitle.getText().toString().trim();
+        String noteText = textNote.getText().toString().trim();
+        int noteId = (int) ContentUris.parseId(uriNote);
+        NoteReminderNotification.notify(this, noteText, noteTitle, noteId);
     }
 
     @Override
