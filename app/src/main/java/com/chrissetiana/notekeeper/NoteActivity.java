@@ -310,9 +310,15 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
         } else if (id == R.id.action_cancel) {
             isCancelling = true;
             finish();
+        } else if (id == R.id.action_set_reminder) {
+            showReminderNotification();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void showReminderNotification() {
+        NoteReminderNotification.notify(this, "This is a sample notification", 0);
     }
 
     @Override

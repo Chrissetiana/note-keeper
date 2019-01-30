@@ -61,9 +61,9 @@ public class NoteKeeperDatabaseProvider extends ContentProvider {
                 break;
             case NOTES_ROW:
                 mimeType = ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + MIME_VENDOR_TYPE + Notes.PATH;
-
-
         }
+
+        return mimeType;
     }
 
     @Override
