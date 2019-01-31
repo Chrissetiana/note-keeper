@@ -171,6 +171,7 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
             protected Object doInBackground(Object[] objects) {
                 SQLiteDatabase db = databaseHelper.getWritableDatabase();
                 db.delete(NoteInfoEntry.TABLE_NAME, selection, selectionArgs);
+//                getContentResolver().delete(uriNote, null, null);
 
                 return null;
             }
@@ -281,12 +282,27 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     private void createNote() {
-        final ContentValues values = new ContentValues();
+        AsyncTask<ContentValues, Void, Uri> task = new AsyncTask<ContentValues, Void, Uri>() {
+            @Override
+            protected Uri doInBackground(ContentValues... params) {
+                ContentValues values = params[0];
+                Uri uri = getContentResolver().insert(Notes.CONTENT_URI, values);
+                
+                return uri;
+            }
+
+            @Override
+            protected void onPostExecute(Uri uri) {
+                uriNote = uri;
+            }
+        };
+
+        ContentValues values = new ContentValues();
         values.put(Notes.COLUMN_COURSE_ID, "");
         values.put(Notes.COLUMN_NOTE_TITLE, "");
         values.put(Notes.COLUMN_NOTE_TEXT, "");
 
-        uriNote = getContentResolver().insert(Notes.CONTENT_URI, values);
+        task.execute(values);
     }
 
     @Override
