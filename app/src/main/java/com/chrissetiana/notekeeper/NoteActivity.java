@@ -11,11 +11,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Spinner;
 
@@ -282,18 +285,42 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
     }
 
     private void createNote() {
-        AsyncTask<ContentValues, Void, Uri> task = new AsyncTask<ContentValues, Void, Uri>() {
+        AsyncTask<ContentValues, Integer, Uri> task = new AsyncTask<ContentValues, Integer, Uri>() {
+
+            private ProgressBar progressBar;
+
+            @Override
+            protected void onPreExecute() {
+                progressBar = findViewById(R.id.progress_bar);
+                progressBar.setVisibility(View.VISIBLE);
+                progressBar.setProgress(1);
+            }
+
             @Override
             protected Uri doInBackground(ContentValues... params) {
                 ContentValues values = params[0];
                 Uri uri = getContentResolver().insert(Notes.CONTENT_URI, values);
-                
+
+                simulateLongRunningWork();
+                publishProgress(2);
+
+                simulateLongRunningWork();
+                publishProgress(3);
+
                 return uri;
+            }
+
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                int progressValue = values[0];
+                progressBar.setProgress(progressValue);
             }
 
             @Override
             protected void onPostExecute(Uri uri) {
                 uriNote = uri;
+                displaySnackBar(uriNote.toString());
+                progressBar.setVisibility(View.GONE);
             }
         };
 
@@ -303,6 +330,25 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
         values.put(Notes.COLUMN_NOTE_TEXT, "");
 
         task.execute(values);
+    }
+
+    private void simulateLongRunningWork() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void displaySnackBar(String s) {
+        View parentLayout = findViewById(android.R.id.content);
+        Snackbar snackbar = Snackbar.make(parentLayout, s, Snackbar.LENGTH_SHORT);
+        snackbar.show();
     }
 
     @Override
