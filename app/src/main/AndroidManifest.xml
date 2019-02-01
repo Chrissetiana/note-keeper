@@ -13,6 +13,10 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
+        <service
+            android:name=".NoteBackupService"
+            android:exported="false" />
+
         <provider
             android:name=".NoteKeeperDatabaseProvider"
             android:authorities="com.chrissetiana.notekeeper.provider"

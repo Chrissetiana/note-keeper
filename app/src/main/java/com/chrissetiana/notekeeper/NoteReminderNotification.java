@@ -47,8 +47,11 @@ public class NoteReminderNotification {
         // TODO: Remove this if your notification has no relevant thumbnail.
         final Bitmap picture = BitmapFactory.decodeResource(res, R.drawable.logo);
 
-        Intent intent = new Intent(context, NoteActivity.class);
-        intent.putExtra(NoteActivity.NOTE_ID, noteId);
+        Intent noteActivityIntent = new Intent(context, NoteActivity.class);
+        noteActivityIntent.putExtra(NoteActivity.NOTE_ID, noteId);
+
+        Intent noteBackupIntent = new Intent(context, NoteBackupService.class);
+        noteBackupIntent.putExtra(NoteBackupService.EXTRA_COURSE_ID, NoteBackup.ALL_COURSES);
 
         final NotificationCompat.Builder builder = new NotificationCompat.Builder(context)
 
@@ -95,9 +98,10 @@ public class NoteReminderNotification {
 
                 // Set the pending intent to be initiated when the user touches
                 // the notification.
-                .setContentIntent(PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT))
+                .setContentIntent(PendingIntent.getActivity(context, 0, noteActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT))
 
                 .addAction(0, "View all notes", PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT))
+                .addAction(0, "Backup notes", PendingIntent.getService(context, 0, noteBackupIntent, PendingIntent.FLAG_UPDATE_CURRENT))
 
                 // Automatically dismiss the notification when it is touched.
                 .setAutoCancel(true);
