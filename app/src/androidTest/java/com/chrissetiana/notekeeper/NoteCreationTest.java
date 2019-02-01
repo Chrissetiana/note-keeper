@@ -3,6 +3,7 @@ package com.chrissetiana.notekeeper;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,6 +29,11 @@ public class NoteCreationTest {
 
     private static DataManager dataManager;
 
+    @BeforeClass
+    public static void classSetUp() {
+        dataManager = DataManager.getInstance();
+    }
+
     @Rule
     public ActivityTestRule<NoteListActivity> rule = new ActivityTestRule<>(NoteListActivity.class);
 
@@ -38,11 +44,15 @@ public class NoteCreationTest {
         final String noteText = "This is the body of our test note";
 
         onView(withId(R.id.fab)).perform(click());
+
         onView(withId(R.id.spinner_courses)).perform(click());
 
         onData(allOf(instanceOf(CourseInfo.class), equalTo(course)))
                 .perform(click())
                 .check(matches(withSpinnerText(containsString(course.getTitle()))));
+
+        onView(withId(R.id.spinner_courses)).check(matches(withSpinnerText(
+                containsString(course.getTitle()))));
 
         onView(withId(R.id.text_title))
                 .perform(typeText(noteTitle))
@@ -51,6 +61,9 @@ public class NoteCreationTest {
         onView(withId(R.id.text_note))
                 .perform(typeText(noteText), closeSoftKeyboard())
                 .check(matches(withText(containsString(noteTitle))));
+
+        onView(withId(R.id.text_note))
+                .check(matches(withText(containsString(noteText))));
 
         pressBack();
 

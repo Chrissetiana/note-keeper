@@ -12,16 +12,16 @@ import java.util.List;
 public class DataManager {
     private static DataManager ourInstance = null;
 
-    private final List<CourseInfo> courses = new ArrayList<>();
+    private List<CourseInfo> courses = new ArrayList<>();
     private List<NoteInfo> notes = new ArrayList<>();
 
     private DataManager() {
     }
 
-    public static DataManager getInstance() {
+    static DataManager getInstance() {
         if (ourInstance == null) {
             ourInstance = new DataManager();
-//            ourInstance.initializeCourses();
+            ourInstance.initializeCourses();
 //            ourInstance.initializeExampleNotes();
         }
 
@@ -31,13 +31,21 @@ public class DataManager {
     static void loadFromDatabase(NoteKeeperDatabaseHelper helper) {
         SQLiteDatabase db = helper.getReadableDatabase();
 
-        final String[] columnsCourse = {CourseInfoEntry.COLUMN_COURSE_ID, CourseInfoEntry.COLUMN_COURSE_TITLE};
+        final String[] columnsCourse = {
+                CourseInfoEntry.COLUMN_COURSE_ID,
+                CourseInfoEntry.COLUMN_COURSE_TITLE};
         final Cursor cursorCourses = db.query(CourseInfoEntry.TABLE_NAME, columnsCourse, null, null, null, null, CourseInfoEntry.COLUMN_COURSE_TITLE + " DESC");
+
         loadCoursesFromDatabase(cursorCourses);
 
-        final String[] columnsNotes = {NoteInfoEntry.COLUMN_NOTE_TITLE, NoteInfoEntry.COLUMN_NOTE_TEXT, NoteInfoEntry.COLUMN_COURSE_ID, NoteInfoEntry._ID};
+        final String[] columnsNotes = {
+                NoteInfoEntry.COLUMN_NOTE_TITLE,
+                NoteInfoEntry.COLUMN_NOTE_TEXT,
+                NoteInfoEntry.COLUMN_COURSE_ID,
+                NoteInfoEntry._ID};
         String orderBy = NoteInfoEntry.COLUMN_COURSE_ID + "," + NoteInfoEntry.COLUMN_NOTE_TITLE;
         final Cursor cursorNotes = db.query(NoteInfoEntry.TABLE_NAME, columnsNotes, null, null, null, null, orderBy);
+
         loadNotesFromDatabase(cursorNotes);
     }
 
@@ -110,7 +118,7 @@ public class DataManager {
         return -1;
     }
 
-    void removeNote(int index) {
+    public void removeNote(int index) {
         notes.remove(index);
     }
 
