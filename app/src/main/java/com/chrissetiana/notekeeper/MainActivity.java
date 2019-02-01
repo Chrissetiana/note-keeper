@@ -208,9 +208,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             return true;
         } else if (id == R.id.action_backup) {
             backupNotes();
+        } else if (id == R.id.action_upload) {
+            uploadNotes();
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void uploadNotes() {
+
     }
 
     private void backupNotes() {
