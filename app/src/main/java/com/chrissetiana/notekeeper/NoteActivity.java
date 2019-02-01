@@ -57,6 +57,19 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
     private boolean courseQueryFinished;
     private Uri uriNote;
 
+    public static void simulateLongRunningWork() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
     @Override
     protected void onDestroy() {
         databaseHelper.close();
@@ -330,19 +343,6 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
         values.put(Notes.COLUMN_NOTE_TEXT, "");
 
         task.execute(values);
-    }
-
-    public static void simulateLongRunningWork() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
     }
 
     private void displaySnackBar(String s) {

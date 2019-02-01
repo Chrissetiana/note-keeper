@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.provider.BaseColumns;
+import android.support.annotation.NonNull;
 
 import com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.CourseInfoEntry;
 import com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.NoteInfoEntry;
@@ -39,13 +40,13 @@ public class NoteKeeperDatabaseProvider extends ContentProvider {
     }
 
     @Override
-    public int delete(Uri uri, String selection, String[] selectionArgs) {
+    public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
         // Implement this to handle requests to delete one or more rows.
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
     @Override
-    public String getType(Uri uri) {
+    public String getType(@NonNull Uri uri) {
         String mimeType = null;
         int uriMatch = uriMatcher.match(uri);
 
@@ -67,21 +68,21 @@ public class NoteKeeperDatabaseProvider extends ContentProvider {
     }
 
     @Override
-    public Uri insert(Uri uri, ContentValues values) {
+    public Uri insert(@NonNull Uri uri, ContentValues values) {
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
 
         Uri rowUri = null;
-        long rowId = -1;
+        long rowId;
         int uriMatch = uriMatcher.match(uri);
 
         switch (uriMatch) {
             case NOTES:
                 rowId = db.insert(NoteInfoEntry.TABLE_NAME, null, values);
-                ContentUris.withAppendedId(Notes.CONTENT_URI, rowId);
+                rowUri = ContentUris.withAppendedId(Notes.CONTENT_URI, rowId);
                 break;
             case COURSES:
                 rowId = db.insert(CourseInfoEntry.TABLE_NAME, null, values);
-                ContentUris.withAppendedId(Courses.CONTENT_URI, rowId);
+                rowUri = ContentUris.withAppendedId(Courses.CONTENT_URI, rowId);
                 break;
             case NOTES_EXPANDED:
                 break;
@@ -97,7 +98,7 @@ public class NoteKeeperDatabaseProvider extends ContentProvider {
     }
 
     @Override
-    public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
+    public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         SQLiteDatabase db = databaseHelper.getReadableDatabase();
         Cursor cursor = null;
 
@@ -140,8 +141,8 @@ public class NoteKeeperDatabaseProvider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        // TODO: Implement this to handle requests to update one or more rows.
+    public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
+        // Implement this to handle requests to update one or more rows.
         throw new UnsupportedOperationException("Not yet implemented");
     }
 }

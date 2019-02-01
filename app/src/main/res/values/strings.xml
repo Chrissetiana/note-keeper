@@ -94,7 +94,6 @@
 
     <string name="note_reminder_notification_title_template">Note reminder: %1$s</string>
 
-    <!-- TODO: remove this placeholder text -->
     <string name="note_reminder_notification_placeholder_text_template">You said %1$s and lorem
         ipsum dolor sit amet, consectetur adipiscing elit. Etiam non enim magna. Morbi dictum, velit
         vel semper venenatis, magna odio volutpat velit, at ullamcorper nulla lacus sed turpis.
