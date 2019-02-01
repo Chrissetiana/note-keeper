@@ -332,7 +332,7 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
         task.execute(values);
     }
 
-    private void simulateLongRunningWork() {
+    public static void simulateLongRunningWork() {
         new Thread(new Runnable() {
             @Override
             public void run() {
