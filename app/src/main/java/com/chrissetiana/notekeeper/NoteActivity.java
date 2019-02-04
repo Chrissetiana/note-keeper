@@ -257,12 +257,13 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
         String courseId = noteCursor.getString(cursorIdPos);
         String courseTitle = noteCursor.getString(cursorTitlePos);
         String courseText = noteCursor.getString(cursorTextPos);
-
         int courseIndex = getCourseIdIndex(courseId);
-        spinnerCourses.setSelection(courseIndex);
 
+        spinnerCourses.setSelection(courseIndex);
         textTitle.setText(courseTitle);
         textNote.setText(courseText);
+
+        CourseEventBroadcastHelper.sendEventBroadcast(this, courseId, "Editing Note");
     }
 
     private int getCourseIdIndex(String courseId) {
