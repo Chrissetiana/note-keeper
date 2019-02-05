@@ -58,7 +58,8 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
     private SimpleCursorAdapter adapterCourses;
     private boolean notesQueryFinished;
     private boolean courseQueryFinished;
-    private Uri uriNote;
+    private Uri noteUri;
+    private String NOTE_URI;
 
     public static void simulateLongRunningWork() {
         new Thread(new Runnable() {
@@ -107,6 +108,9 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
             saveOriginalStateValues();
         } else {
             restoreOriginalStateValues(savedInstanceState);
+
+            String noteUriStr = savedInstanceState.getString(NOTE_URI);
+            noteUri = Uri.parse(noteUriStr);
         }
 
         textTitle = findViewById(R.id.text_title);
@@ -213,6 +217,7 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
         outState.putString(ORIGINAL_NOTE_ID, originalNoteId);
         outState.putString(ORIGINAL_NOTE_TITLE, originalNoteTitle);
         outState.putString(ORIGINAL_NOTE_TEXT, originalNoteText);
+        outState.putString(NOTE_URI, noteUri.toString());
     }
 
     private void saveNote() {
@@ -335,8 +340,8 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
 
             @Override
             protected void onPostExecute(Uri uri) {
-                uriNote = uri;
-                displaySnackBar(uriNote.toString());
+                noteUri = uri;
+                displaySnackBar(noteUri.toString());
                 progressBar.setVisibility(View.GONE);
             }
         };
@@ -386,7 +391,7 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
     private void showReminderNotification() {
         String noteTitle = textTitle.getText().toString().trim();
         String noteText = textNote.getText().toString().trim();
-        int noteId = (int) ContentUris.parseId(uriNote);
+        int noteId = (int) ContentUris.parseId(noteUri);
 
         Intent intent = new Intent(this, NoteReminderReceiver.class);
         intent.putExtra(NoteReminderReceiver.EXTRA_NOTE_TITLE, noteTitle);
@@ -473,7 +478,7 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
 
         ContentUris.withAppendedId(Notes.CONTENT_URI, noteId);
 
-        return new CursorLoader(this, uriNote, columns, null, null, null);
+        return new CursorLoader(this, noteUri, columns, null, null, null);
     }
 
     @Override
