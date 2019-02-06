@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 public class ModuleStatusView extends View {
+    public static final int EDIT_MODE_MODULE_COUNT = 7;
     private boolean[] moduleStatus;
     private float outlineWidth;
     private float shapeSize;
@@ -20,14 +21,6 @@ public class ModuleStatusView extends View {
     private int fillColor;
     private Paint paintFill;
     private float radius;
-
-    public boolean[] getModuleStatus() {
-        return moduleStatus;
-    }
-
-    public void setModuleStatus(boolean[] moduleStatus) {
-        this.moduleStatus = moduleStatus;
-    }
 
     public ModuleStatusView(Context context) {
         super(context);
@@ -44,7 +37,19 @@ public class ModuleStatusView extends View {
         init(attrs, defStyle);
     }
 
+    public boolean[] getModuleStatus() {
+        return moduleStatus;
+    }
+
+    public void setModuleStatus(boolean[] moduleStatus) {
+        this.moduleStatus = moduleStatus;
+    }
+
     private void init(AttributeSet attrs, int defStyle) {
+        if (isInEditMode()) {
+            setupEditModeValues();
+        }
+
         final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.ModuleStatusView, defStyle, 0);
 
         a.recycle();
@@ -68,6 +73,17 @@ public class ModuleStatusView extends View {
 
         paintFill.setStyle(Paint.Style.FILL);
         paintFill.setColor(fillColor);
+    }
+
+    private void setupEditModeValues() {
+        boolean[] exampleModuleValues = new boolean[EDIT_MODE_MODULE_COUNT];
+        int middle = EDIT_MODE_MODULE_COUNT / 2;
+
+        for (int i = 0; i < middle; i++) {
+            exampleModuleValues[i] = true;
+        }
+
+        setModuleStatus(exampleModuleValues);
     }
 
     private void setupModuleRectangles() {
