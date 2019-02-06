@@ -40,7 +40,8 @@ import java.util.List;
 import static com.chrissetiana.notekeeper.NoteActivity.LOADER_NOTES;
 import static com.chrissetiana.notekeeper.NoteKeeperDatabaseContract.NoteInfoEntry;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
+public class MainActivity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener, LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final int NOTE_UPLOADER_JOB_ID = 1;
     private NoteRecyclerAdapter noteAdapter;
