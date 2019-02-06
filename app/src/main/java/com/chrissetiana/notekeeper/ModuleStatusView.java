@@ -19,6 +19,7 @@ public class ModuleStatusView extends View {
     private Paint paintOutline;
     private int fillColor;
     private Paint paintFill;
+    private float radius;
 
     public boolean[] getModuleStatus() {
         return moduleStatus;
@@ -51,6 +52,7 @@ public class ModuleStatusView extends View {
         outlineWidth = 6f;
         shapeSize = 144f;
         spacing = 30f;
+        radius = (shapeSize - outlineWidth) / 2;
 
         setupModuleRectangles();
 
@@ -83,6 +85,15 @@ public class ModuleStatusView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
+        for (int i = 0; i < moduleRectangles.length; i++) {
+            float x = moduleRectangles[i].centerX();
+            float y = moduleRectangles[i].centerY();
 
+            if (moduleStatus[i]) {
+                canvas.drawCircle(x, y, radius, paintFill);
+            }
+
+            canvas.drawCircle(x, y, radius, paintOutline);
+        }
     }
 }
