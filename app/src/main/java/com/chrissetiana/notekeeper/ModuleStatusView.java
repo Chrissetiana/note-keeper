@@ -3,6 +3,8 @@ package com.chrissetiana.notekeeper;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.View;
@@ -13,6 +15,10 @@ public class ModuleStatusView extends View {
     private float shapeSize;
     private float spacing;
     private Rect[] moduleRectangles;
+    private int outlineColor;
+    private Paint paintOutline;
+    private int fillColor;
+    private Paint paintFill;
 
     public boolean[] getModuleStatus() {
         return moduleStatus;
@@ -47,6 +53,19 @@ public class ModuleStatusView extends View {
         spacing = 30f;
 
         setupModuleRectangles();
+
+        outlineColor = Color.BLACK;
+        paintOutline = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+        paintOutline.setStyle(Paint.Style.STROKE);
+        paintOutline.setStrokeWidth(outlineWidth);
+        paintOutline.setColor(outlineColor);
+
+        fillColor = getContext().getResources().getColor(R.color.psorange);
+        paintFill = new Paint(Paint.ANTI_ALIAS_FLAG);
+
+        paintFill.setStyle(Paint.Style.FILL);
+        paintFill.setColor(fillColor);
     }
 
     private void setupModuleRectangles() {
@@ -63,5 +82,7 @@ public class ModuleStatusView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
+
     }
 }
