@@ -90,11 +90,28 @@ public class ModuleStatusView extends View {
         moduleRectangles = new Rect[moduleStatus.length];
 
         for (int i = 0; i < moduleRectangles.length; i++) {
-            int x = (int) (i * (shapeSize + spacing));
-            int y = 0;
+            int x = getPaddingLeft() + (int) (i * (shapeSize + spacing));
+            int y = getPaddingTop();
 
             moduleRectangles[i] = new Rect(x, y, x + (int) shapeSize, y + (int) shapeSize);
         }
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int desiredWidth = 0;
+        int desiredHeight = 0;
+
+        desiredWidth = (int) ((moduleStatus.length * (shapeSize + spacing)) - spacing);
+        desiredWidth += getPaddingLeft() + getPaddingRight();
+
+        desiredHeight = (int) shapeSize;
+        desiredHeight += getPaddingTop() + getPaddingBottom();
+
+        int width = resolveSizeAndState(desiredWidth, widthMeasureSpec, 0);
+        int height = resolveSizeAndState(desiredHeight, heightMeasureSpec, 0);
+
+        setMeasuredDimension(width, height);
     }
 
     @Override

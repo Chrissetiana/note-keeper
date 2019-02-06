@@ -72,4 +72,16 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.500684" />
 
+    <view
+        android:id="@+id/module_status"
+        class="com.chrissetiana.notekeeper.ModuleStatusView"
+        id="@+id/view"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:padding="5dp"
+        app:layout_constraintEnd_toEndOf="@+id/text_title"
+        app:layout_constraintStart_toStartOf="@+id/text_title"
+        app:layout_constraintTop_toBottomOf="@+id/text_title" />
+
 </android.support.constraint.ConstraintLayout>
