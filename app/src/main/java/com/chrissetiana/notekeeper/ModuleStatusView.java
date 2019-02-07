@@ -13,6 +13,7 @@ import android.view.View;
 public class ModuleStatusView extends View {
     public static final int EDIT_MODE_MODULE_COUNT = 7;
     public static final int INVALID_INDEX = -1;
+    public static final int SHAPE_CIRCLE = 0;
     private boolean[] moduleStatus;
     private float outlineWidth;
     private float shapeSize;
@@ -24,6 +25,7 @@ public class ModuleStatusView extends View {
     private Paint paintFill;
     private float radius;
     private int maxHorizontalModules;
+    private int shape;
 
     public ModuleStatusView(Context context) {
         super(context);
@@ -56,6 +58,8 @@ public class ModuleStatusView extends View {
         final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.ModuleStatusView, defStyle, 0);
 
         outlineColor = a.getColor(R.styleable.ModuleStatusView_outlineColor, Color.BLACK);
+        shape = a.getInt(R.styleable.ModuleStatusView_shape, SHAPE_CIRCLE);
+
         a.recycle();
 
         outlineWidth = 6f;
@@ -138,14 +142,31 @@ public class ModuleStatusView extends View {
         super.onDraw(canvas);
 
         for (int i = 0; i < moduleRectangles.length; i++) {
-            float x = moduleRectangles[i].centerX();
-            float y = moduleRectangles[i].centerY();
+            if (shape == SHAPE_CIRCLE) {
+                float x = moduleRectangles[i].centerX();
+                float y = moduleRectangles[i].centerY();
 
-            if (moduleStatus[i]) {
-                canvas.drawCircle(x, y, radius, paintFill);
+                if (moduleStatus[i]) {
+                    canvas.drawCircle(x, y, radius, paintFill);
+                }
+
+                canvas.drawCircle(x, y, radius, paintOutline);
+            } else {
+                drawSquare(canvas, i);
             }
+        }
+    }
 
-            canvas.drawCircle(x, y, radius, paintOutline);
+    private void drawSquare(Canvas canvas, int i) {
+        Rect moduleRectangle = moduleRectangles[i];
+
+        if (moduleStatus[i]) {
+            canvas.drawRect(moduleRectangle, paintFill);
+            canvas.drawRect(moduleRectangle.left + (outlineWidth / 2),
+                    moduleRectangle.top + (outlineWidth / 2),
+                    moduleRectangle.right - (outlineWidth / 2),
+                    moduleRectangle.bottom - (outlineWidth / 2),
+                    paintFill);
         }
     }
 
