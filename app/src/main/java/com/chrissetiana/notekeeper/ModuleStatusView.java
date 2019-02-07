@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -14,6 +15,7 @@ public class ModuleStatusView extends View {
     public static final int EDIT_MODE_MODULE_COUNT = 7;
     public static final int INVALID_INDEX = -1;
     public static final int SHAPE_CIRCLE = 0;
+    public static final float DEFAULT_OUTLINE_WIDTH_DP = 2f;
     private boolean[] moduleStatus;
     private float outlineWidth;
     private float shapeSize;
@@ -55,14 +57,18 @@ public class ModuleStatusView extends View {
             setupEditModeValues();
         }
 
+        DisplayMetrics dm = getContext().getResources().getDisplayMetrics();
+        float displayDensity = dm.density;
+        float defaultOutlineWidthPixels = displayDensity * DEFAULT_OUTLINE_WIDTH_DP;
+
         final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.ModuleStatusView, defStyle, 0);
 
         outlineColor = a.getColor(R.styleable.ModuleStatusView_outlineColor, Color.BLACK);
         shape = a.getInt(R.styleable.ModuleStatusView_shape, SHAPE_CIRCLE);
+        outlineWidth = a.getDimension(R.styleable.ModuleStatusView_outlineWidth, defaultOutlineWidthPixels);
 
         a.recycle();
 
-        outlineWidth = 6f;
         shapeSize = 144f;
         spacing = 30f;
         radius = (shapeSize - outlineWidth) / 2;
