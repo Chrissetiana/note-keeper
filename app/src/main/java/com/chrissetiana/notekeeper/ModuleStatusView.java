@@ -7,10 +7,12 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 
 public class ModuleStatusView extends View {
     public static final int EDIT_MODE_MODULE_COUNT = 7;
+    public static final int INVALID_INDEX = -1;
     private boolean[] moduleStatus;
     private float outlineWidth;
     private float shapeSize;
@@ -145,5 +147,41 @@ public class ModuleStatusView extends View {
 
             canvas.drawCircle(x, y, radius, paintOutline);
         }
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                return true;
+            case MotionEvent.ACTION_UP:
+                int moduleIndex = findItemAtPoint(event.getX(), event.getY());
+                onModuleSelected(moduleIndex);
+                return true;
+        }
+
+        return super.onTouchEvent(event);
+    }
+
+    private void onModuleSelected(int moduleIndex) {
+        if (moduleIndex == INVALID_INDEX) {
+            return;
+        }
+
+        moduleStatus[moduleIndex] = !moduleStatus[moduleIndex];
+        invalidate();
+    }
+
+    private int findItemAtPoint(float x, float y) {
+        int moduleIndex = INVALID_INDEX;
+
+        for (int i = 0; i < moduleRectangles.length; i++) {
+            if (moduleRectangles[i].contains((int) x, (int) y)) {
+                moduleIndex = i;
+                break;
+            }
+        }
+
+        return 0;
     }
 }

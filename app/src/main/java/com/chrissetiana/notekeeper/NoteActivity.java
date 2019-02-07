@@ -60,6 +60,7 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
     private boolean courseQueryFinished;
     private Uri noteUri;
     private String NOTE_URI;
+    private ModuleStatusView viewModuleStatus;
 
     public static void simulateLongRunningWork() {
         new Thread(new Runnable() {
@@ -118,7 +119,23 @@ public class NoteActivity extends AppCompatActivity implements LoaderManager.Loa
 
         if (!isNewNote) {
             getLoaderManager().initLoader(LOADER_NOTES, null, this);
+
+            viewModuleStatus = findViewById(R.id.module_status);
+
+            loadModuleStatusValues();
         }
+    }
+
+    private void loadModuleStatusValues() {
+        int totalNUmberOfModules = 11;
+        int completedNumberOfModules = 7;
+        boolean[] moduleStatus = new boolean[totalNUmberOfModules];
+
+        for (int i = 0; i < completedNumberOfModules; i++) {
+            moduleStatus[i] = true;
+        }
+
+        viewModuleStatus.setModuleStatus(moduleStatus);
     }
 
     private void loadCourseData() {
