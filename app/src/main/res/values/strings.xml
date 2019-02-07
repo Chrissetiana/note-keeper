@@ -5,6 +5,8 @@
     <string name="hint_note_title">Note title</string>
     <string name="hint_note_text">Note text</string>
 
+    <string name="fab_description">Create new note</string>
+
     <string name="menu_send_email">Send Email</string>
     <string name="menu_add_image">Add image</string>
     <string name="menu_cancel">Cancel</string>
