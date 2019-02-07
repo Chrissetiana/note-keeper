@@ -55,6 +55,7 @@ public class ModuleStatusView extends View {
 
         final TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.ModuleStatusView, defStyle, 0);
 
+        outlineColor = a.getColor(R.styleable.ModuleStatusView_outlineColor, Color.BLACK);
         a.recycle();
 
         outlineWidth = 6f;
@@ -62,7 +63,6 @@ public class ModuleStatusView extends View {
         spacing = 30f;
         radius = (shapeSize - outlineWidth) / 2;
 
-        outlineColor = Color.BLACK;
         paintOutline = new Paint(Paint.ANTI_ALIAS_FLAG);
 
         paintOutline.setStyle(Paint.Style.STROKE);
