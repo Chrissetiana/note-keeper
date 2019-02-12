@@ -147,20 +147,17 @@ public class ModuleStatusView extends View {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int desiredWidth = 0;
-        int desiredHeight = 0;
-
         int specWidth = MeasureSpec.getSize(widthMeasureSpec);
         int availableWidth = specWidth - getPaddingLeft() - getPaddingRight();
         int horizontalModulesThatCanFit = (int) (availableWidth / (shapeSize + spacing));
         maxHorizontalModules = Math.min(horizontalModulesThatCanFit, moduleStatus.length);
 
-        desiredWidth = (int) ((maxHorizontalModules * (shapeSize + spacing)) - spacing);
+        int desiredWidth = (int) ((maxHorizontalModules * (shapeSize + spacing)) - spacing);
         desiredWidth += getPaddingLeft() + getPaddingRight();
 
         int rows = ((moduleStatus.length - 1) / maxHorizontalModules) + 1;
 
-        desiredHeight = (int) ((rows * (shapeSize + spacing) - spacing));
+        int desiredHeight = (int) ((rows * (shapeSize + spacing) - spacing));
         desiredHeight += getPaddingTop() + getPaddingBottom();
 
         int width = resolveSizeAndState(desiredWidth, widthMeasureSpec, 0);
@@ -243,12 +240,12 @@ public class ModuleStatusView extends View {
             }
         }
 
-        return 0;
+        return moduleIndex;
     }
 
     private class ModuleStatusAccessibilityHelper extends ExploreByTouchHelper {
 
-        public ModuleStatusAccessibilityHelper(@NonNull View host) {
+        ModuleStatusAccessibilityHelper(@NonNull View host) {
             super(host);
         }
 
@@ -260,11 +257,11 @@ public class ModuleStatusView extends View {
 
         @Override
         protected void getVisibleVirtualViews(List<Integer> list) {
-            if(moduleRectangles == null) {
+            if (moduleRectangles == null) {
                 return;
             }
 
-            for(int i=0; i< moduleRectangles.length; i++) {
+            for (int i = 0; i < moduleRectangles.length; i++) {
                 list.add(i);
             }
         }
@@ -281,7 +278,7 @@ public class ModuleStatusView extends View {
 
         @Override
         protected boolean onPerformActionForVirtualView(int virtualViewId, int action, @Nullable Bundle bundle) {
-            switch(action) {
+            switch (action) {
                 case AccessibilityNodeInfoCompat.ACTION_CLICK:
                     onModuleSelected(virtualViewId);
                     return true;
